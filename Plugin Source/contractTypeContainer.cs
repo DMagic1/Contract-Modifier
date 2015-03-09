@@ -65,6 +65,7 @@ namespace ContractModifier
 		private Type contractType;
 		private string name = "";
 		private Contract contractC = null;
+		private bool generic = false;
 
 		internal contractTypeContainer (Type CType)
 		{
@@ -79,42 +80,53 @@ namespace ContractModifier
 				
 			}
 			typeName = CType.Name;
-			name = typeName;
 			name = displayName(name);
 			maxOffer /= 10f;
 			maxActive /= 10f;
 			contractTypeNode = this.AsConfigNode;
+			if (typeName == "GlobalSettings")
+				generic = true;
 		}
 
-		internal contractTypeContainer (string N, float FRew, float FAdv, float FPen, float RRew, float RPen, float SRew, float Off, float Act, ConfigNode node )
+		internal contractTypeContainer (string n)
 		{
-			typeName = N;
-			name = displayName(N);
-			fundReward = FRew;
-			fundAdvance = FAdv;
-			fundPenalty = FPen;
-			repReward = RRew;
-			repPenalty = RPen;
-			scienceReward = SRew;
-			maxOffer = Off / 10f;
-			maxActive = Act / 10f;
+			typeName = n;
+			name = displayName(n);
+			maxOffer /= 10f;
+			maxActive /= 10f;
+			contractTypeNode = this.AsConfigNode;
+			if (typeName == "GlobalSettings")
+				generic = true;
+		}
+
+		internal contractTypeContainer (ConfigNode node )
+		{
 			contractTypeNode = node;
 		}
 
-		private ConfigNode createNode()
+		internal bool loadFromNode(bool zero)
 		{
-			ConfigNode cNode = new ConfigNode("CONTRACT_TYPE_CONFIG");
-			cNode.AddValue("name", typeName);
-			cNode.AddValue("fundsReward", fundReward);
-			cNode.AddValue("fundsAdvance", fundAdvance);
-			cNode.AddValue("fundsPenalty", fundPenalty);
-			cNode.AddValue("repReward", repReward);
-			cNode.AddValue("repPenalty", repPenalty);
-			cNode.AddValue("scienceReward", scienceReward);
-			cNode.AddValue("maxOffered", maxOffer * 10f);
-			cNode.AddValue("maxActive", maxActive * 10f);
-
-			return cNode;
+			if (Load(contractTypeNode))
+			{
+				name = displayName(typeName);
+				fundReward = fundReward.returnNonZero(zero);
+				fundAdvance = fundAdvance.returnNonZero(zero);
+				fundPenalty = fundPenalty.returnNonZero(zero);
+				repReward = repReward.returnNonZero(zero);
+				repPenalty = repPenalty.returnNonZero(zero);
+				scienceReward = scienceReward.returnNonZero(zero);
+				durationTime = durationTime.returnNonZero(zero);
+				maxOffer /= 10;
+				maxActive /= 10;
+				if (typeName == "GlobalSettings")
+					generic = true;
+				return true;
+			}
+			else
+			{
+				LogFormatted("Error in creating contract type container from config node; skipping...");
+				return false;
+			}
 		}
 
 		private string displayName (string s)
@@ -135,6 +147,11 @@ namespace ContractModifier
 		public Type ContractType
 		{
 			get { return contractType; }
+		}
+
+		public bool Generic
+		{
+			get { return generic; }
 		}
 
 		public string Name

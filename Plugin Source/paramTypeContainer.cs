@@ -56,6 +56,7 @@ namespace ContractModifier
 		private string name;
 		private float[] paramValues = new float[5];
 		private ConfigNode parameterTypeNode;
+		private bool generic = false;
 
 		internal paramTypeContainer (Type PType)
 		{
@@ -73,31 +74,43 @@ namespace ContractModifier
 			name = displayName(typeName);
 			fundReward = fundPenalty = repReward = repPenalty = scienceReward = 1f;
 			parameterTypeNode = this.AsConfigNode;
+			if (typeName == "GlobalSettings")
+				generic = true;
 		}
 
-		internal paramTypeContainer (string N, float FRew, float FPen, float RRew, float RPen, float SRew, ConfigNode node)
+		internal paramTypeContainer (string n)
 		{
-			typeName = N;
-			name = displayName(N);
-			fundReward = FRew;
-			fundPenalty = FPen;
-			repReward = RRew;
-			repPenalty = RPen;
-			scienceReward = SRew;
+			typeName = n;
+			name = displayName(n);
+			parameterTypeNode = this.AsConfigNode;
+			if (typeName == "GlobalSettings")
+				generic = true;
+		}
+
+		internal paramTypeContainer (ConfigNode node)
+		{
 			parameterTypeNode = node;
 		}
 
-		private ConfigNode createNode()
+		internal bool loadFromNode(bool zero)
 		{
-			ConfigNode pNode = new ConfigNode("PARAMETER_TYPE_CONFIG");
-			pNode.AddValue("name", typeName);
-			pNode.AddValue("fundsReward", fundReward);
-			pNode.AddValue("fundsPenalty", fundPenalty);
-			pNode.AddValue("repReward", repReward);
-			pNode.AddValue("repPenalty", repPenalty);
-			pNode.AddValue("scienceReward", scienceReward);
-
-			return pNode;
+			if (Load(parameterTypeNode))
+			{
+				name = displayName(typeName);
+				fundReward = fundReward.returnNonZero(zero);
+				fundPenalty = fundPenalty.returnNonZero(zero);
+				repReward = repReward.returnNonZero(zero);
+				repPenalty = repPenalty.returnNonZero(zero);
+				scienceReward = scienceReward.returnNonZero(zero);
+				if (typeName == "GlobalSettings")
+					generic = true;
+				return true;
+			}
+			else
+			{
+				LogFormatted("Error in creating parameter type container from config node; skipping...");
+				return false;
+			}
 		}
 
 		private string displayName(string s)
@@ -113,6 +126,11 @@ namespace ContractModifier
 		public ConfigNode ParamTypeNode
 		{
 			get { return parameterTypeNode; }
+		}
+
+		public bool Generic
+		{
+			get { return generic; }
 		}
 
 		public Type ParamType
