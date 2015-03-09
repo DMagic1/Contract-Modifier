@@ -22,6 +22,8 @@ namespace ContractModifier
 		private bool warnedZero = false;
 		[Persistent]
 		private bool warnedToolbar = false;
+		[Persistent]
+		private bool warnedAlterActive = false;
 
 		private Dictionary<string, contractTypeContainer> masterContractList = new Dictionary<string, contractTypeContainer>();
 		private Dictionary<string, paramTypeContainer> masterParamList = new Dictionary<string, paramTypeContainer>();
@@ -55,7 +57,7 @@ namespace ContractModifier
 
 		public contractTypeContainer getCType(int i)
 		{
-			return masterContractList.ElementAt(i).Value;
+			return masterContractList.ElementAtOrDefault(i).Value;
 		}
 
 		public contractTypeContainer getCType(string s)
@@ -71,7 +73,7 @@ namespace ContractModifier
 
 		public paramTypeContainer getPType(int i)
 		{
-			return masterParamList.ElementAt(i).Value;
+			return masterParamList.ElementAtOrDefault(i).Value;
 		}
 
 		public paramTypeContainer getPType(string s)
@@ -116,31 +118,43 @@ namespace ContractModifier
 		public bool ShowToolbar
 		{
 			get { return showToolbar; }
+			internal set { showToolbar = value; }
 		}
 
 		public bool AllowZero
 		{
 			get { return allowZero; }
+			internal set { allowZero = value; }
 		}
 
 		public bool AlterActive
 		{
 			get { return alterActive; }
+			internal set { alterActive = value; }
 		}
 
 		public bool StockToolbar
 		{
 			get { return stockToolbar; }
+			internal set { stockToolbar = value; }
 		}
 
 		public bool WarnedZero
 		{
 			get { return warnedZero; }
+			internal set { warnedZero = value; }
+		}
+
+		public bool WarnedAlterActive
+		{
+			get { return warnedAlterActive; }
+			internal set { warnedAlterActive = value; }
 		}
 
 		public bool WarnedToolbar
 		{
 			get { return warnedToolbar; }
+			internal set { warnedToolbar = value; }
 		}
 	}
 
@@ -148,7 +162,7 @@ namespace ContractModifier
 	public class cmConfigLoad : DMCM_MBE
 	{
 		private static contractModifierNode topConfigNode;
-		private const string fileName = "contractModifierConfig.cfg";
+		internal const string fileName = "contractModifierConfig.cfg";
 
 		public static contractModifierNode TopNode
 		{
@@ -170,27 +184,10 @@ namespace ContractModifier
 				{
 					if (cType != null)
 					{
+						contractTypeContainer c = new contractTypeContainer(cType);
 
-						string name;
-						float fRew, fAdv, fPen, rRew, rPen, sRew, mOff, mAct;
-
-						if (cType.HasValue("name"))
-							name = cType.GetValue("name");
-						else
-							continue;
-
-						fRew = stringFloatParse(cType.GetValue("fundsReward"), 1.0f);
-						fAdv = stringFloatParse(cType.GetValue("fundsAdvance"), 1.0f);
-						fPen = stringFloatParse(cType.GetValue("fundsPenalty"), 1.0f);
-						rRew = stringFloatParse(cType.GetValue("repReward"), 1.0f);
-						rPen = stringFloatParse(cType.GetValue("repPenalty"), 1.0f);
-						sRew = stringFloatParse(cType.GetValue("scienceReward"), 1.0f);
-						mOff = stringFloatParse(cType.GetValue("maxOffered"), 100.0f);
-						mAct = stringFloatParse(cType.GetValue("maxActive"), 100.0f);
-
-						contractTypeContainer cCont = new contractTypeContainer(name, fRew, fAdv, fPen, rRew, rPen, sRew, mOff, mAct, cType);
-
-						topConfigNode.addToContractList(cCont);
+						if (c.loadFromNode(topConfigNode.AllowZero))
+							topConfigNode.addToContractList(c);
 					}
 				}
 
@@ -198,23 +195,10 @@ namespace ContractModifier
 				{
 					if (pType != null)
 					{
-						string name;
-						float fRew, fPen, rRew, rPen, sRew;
+						paramTypeContainer p = new paramTypeContainer(pType);
 
-						if (pType.HasValue("name"))
-							name = pType.GetValue("name");
-						else
-							continue;
-
-						fRew = stringFloatParse(pType.GetValue("fundsReward"), 1.0f);
-						fPen = stringFloatParse(pType.GetValue("fundsPenalty"), 1.0f);
-						rRew = stringFloatParse(pType.GetValue("repReward"), 1.0f);
-						rPen = stringFloatParse(pType.GetValue("repPenalty"), 1.0f);
-						sRew = stringFloatParse(pType.GetValue("scienceReward"), 1.0f);
-
-						paramTypeContainer pCont = new paramTypeContainer(name, fRew, fPen, rRew, rPen, sRew, pType);
-
-						topConfigNode.addToParamList(pCont);
+						if (p.loadFromNode(topConfigNode.AllowZero))
+							topConfigNode.addToParamList(p);
 					}
 				}
 			}
