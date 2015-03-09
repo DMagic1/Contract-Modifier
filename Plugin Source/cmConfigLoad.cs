@@ -9,19 +9,38 @@ namespace ContractModifier
 	public class contractModifierNode : DMCM_ConfigNodeStorage
 	{
 		[Persistent]
-		public bool showToolbar = true;
+		private string version = "";
 		[Persistent]
-		public string version = "";
+		private bool showToolbar = true;
+		[Persistent]
+		private bool allowZero = false;
+		[Persistent]
+		private bool alterActive = true;
+		[Persistent]
+		private bool stockToolbar = true;
+		[Persistent]
+		private bool warnedZero = false;
+		[Persistent]
+		private bool warnedToolbar = false;
 
 		private Dictionary<string, contractTypeContainer> masterContractList = new Dictionary<string, contractTypeContainer>();
 		private Dictionary<string, paramTypeContainer> masterParamList = new Dictionary<string, paramTypeContainer>();
+
+		internal contractModifierNode(string filePath)
+		{
+			FilePath = filePath;
+
+			if (Load())
+				topNode = this.AsConfigNode;
+			else
+				topNode = new ConfigNode("contractModifierNode");
+		}
 
 		private ConfigNode topNode;
 
 		public ConfigNode TopNode
 		{
 			get { return topNode; }
-			internal set { topNode = value; }
 		}
 
 		public int ContractTypeCount
@@ -93,6 +112,36 @@ namespace ContractModifier
 				return false;
 			}
 		}
+
+		public bool ShowToolbar
+		{
+			get { return showToolbar; }
+		}
+
+		public bool AllowZero
+		{
+			get { return allowZero; }
+		}
+
+		public bool AlterActive
+		{
+			get { return alterActive; }
+		}
+
+		public bool StockToolbar
+		{
+			get { return stockToolbar; }
+		}
+
+		public bool WarnedZero
+		{
+			get { return warnedZero; }
+		}
+
+		public bool WarnedToolbar
+		{
+			get { return warnedToolbar; }
+		}
 	}
 
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
@@ -108,71 +157,64 @@ namespace ContractModifier
 
 		protected override void Start()
 		{
-			topConfigNode = new contractModifierNode();
-			topConfigNode.FilePath = fileName;
+			topConfigNode = new contractModifierNode(fileName);
 
 			loadConfigFile();
 		}
 
 		private void loadConfigFile()
 		{
-			if (topConfigNode.Load())
+			if (topConfigNode.TopNode != null)
 			{
-				topConfigNode.TopNode = topConfigNode.AsConfigNode;
-				if (topConfigNode.TopNode != null)
+				foreach (ConfigNode cType in topConfigNode.TopNode.GetNodes("CONTRACT_TYPE_CONFIG"))
 				{
-					bool.TryParse(topConfigNode.TopNode.GetValue("showToolbar"), out topConfigNode.showToolbar);
-					topConfigNode.version = topConfigNode.TopNode.GetValue("version");
-
-					foreach (ConfigNode cType in topConfigNode.TopNode.GetNodes("CONTRACT_TYPE_CONFIG"))
+					if (cType != null)
 					{
-						if (cType != null)
-						{
-							string name;
-							float fRew, fAdv, fPen, rRew, rPen, sRew, mOff, mAct;
 
-							if (cType.HasValue("name"))
-								name = cType.GetValue("name");
-							else
-								continue;
+						string name;
+						float fRew, fAdv, fPen, rRew, rPen, sRew, mOff, mAct;
 
-							fRew = stringFloatParse(cType.GetValue("fundsReward"), 1.0f);
-							fAdv = stringFloatParse(cType.GetValue("fundsAdvance"), 1.0f);
-							fPen = stringFloatParse(cType.GetValue("fundsPenalty"), 1.0f);
-							rRew = stringFloatParse(cType.GetValue("repReward"), 1.0f);
-							rPen = stringFloatParse(cType.GetValue("repPenalty"), 1.0f);
-							sRew = stringFloatParse(cType.GetValue("scienceReward"), 1.0f);
-							mOff = stringFloatParse(cType.GetValue("maxOffered"), 100.0f);
-							mAct = stringFloatParse(cType.GetValue("maxActive"), 100.0f);
+						if (cType.HasValue("name"))
+							name = cType.GetValue("name");
+						else
+							continue;
 
-							contractTypeContainer cCont = new contractTypeContainer(name, fRew, fAdv, fPen, rRew, rPen, sRew, mOff, mAct, cType);
+						fRew = stringFloatParse(cType.GetValue("fundsReward"), 1.0f);
+						fAdv = stringFloatParse(cType.GetValue("fundsAdvance"), 1.0f);
+						fPen = stringFloatParse(cType.GetValue("fundsPenalty"), 1.0f);
+						rRew = stringFloatParse(cType.GetValue("repReward"), 1.0f);
+						rPen = stringFloatParse(cType.GetValue("repPenalty"), 1.0f);
+						sRew = stringFloatParse(cType.GetValue("scienceReward"), 1.0f);
+						mOff = stringFloatParse(cType.GetValue("maxOffered"), 100.0f);
+						mAct = stringFloatParse(cType.GetValue("maxActive"), 100.0f);
 
-							topConfigNode.addToContractList(cCont);
-						}
+						contractTypeContainer cCont = new contractTypeContainer(name, fRew, fAdv, fPen, rRew, rPen, sRew, mOff, mAct, cType);
+
+						topConfigNode.addToContractList(cCont);
 					}
+				}
 
-					foreach (ConfigNode pType in topConfigNode.TopNode.GetNodes("PARAMATER_TYPES_CONFIG"))
+				foreach (ConfigNode pType in topConfigNode.TopNode.GetNodes("PARAMATER_TYPES_CONFIG"))
+				{
+					if (pType != null)
 					{
-						if (pType != null)
-						{
-							string name;
-							float fRew, fPen, rRew, rPen, sRew;
+						string name;
+						float fRew, fPen, rRew, rPen, sRew;
 
-							if (pType.HasValue("name"))
-								name = pType.GetValue("name");
-							else
-								continue;
+						if (pType.HasValue("name"))
+							name = pType.GetValue("name");
+						else
+							continue;
 
-							fRew = stringFloatParse(pType.GetValue("fundsReward"), 1.0f);
-							fPen = stringFloatParse(pType.GetValue("fundsPenalty"), 1.0f);
-							rRew = stringFloatParse(pType.GetValue("repReward"), 1.0f);
-							rPen = stringFloatParse(pType.GetValue("repPenalty"), 1.0f);
-							sRew = stringFloatParse(pType.GetValue("scienceReward"), 1.0f);
+						fRew = stringFloatParse(pType.GetValue("fundsReward"), 1.0f);
+						fPen = stringFloatParse(pType.GetValue("fundsPenalty"), 1.0f);
+						rRew = stringFloatParse(pType.GetValue("repReward"), 1.0f);
+						rPen = stringFloatParse(pType.GetValue("repPenalty"), 1.0f);
+						sRew = stringFloatParse(pType.GetValue("scienceReward"), 1.0f);
 
-							paramTypeContainer pCont = new paramTypeContainer(name, fRew, fPen, rRew, rPen, sRew, pType);
+						paramTypeContainer pCont = new paramTypeContainer(name, fRew, fPen, rRew, rPen, sRew, pType);
 
-							topConfigNode.addToParamList(pCont);
-						}
+						topConfigNode.addToParamList(pCont);
 					}
 				}
 			}
