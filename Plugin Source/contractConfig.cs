@@ -197,11 +197,11 @@ namespace ContractModifier
 
 		protected override void DrawWindowPost(int id)
 		{
-			if (contractModifierScenario.Instance.allowZero && !contractModifierScenario.Instance.warnedZero)
+			if (contractModifierScenario.Instance.allowZero && !contractModifierScenario.Instance.CMNode.WarnedZero)
 			{
 				dropDown = true;
 				zPopup = true;
-				if (!contractModifierScenario.Instance.warnedZero)
+				if (!contractModifierScenario.Instance.CMNode.WarnedZero)
 					contractModifierScenario.Instance.allowZero = !contractModifierScenario.Instance.allowZero;
 			}
 
@@ -743,7 +743,7 @@ namespace ContractModifier
 					{
 						dropDown = false;
 						zPopup = false;
-						contractModifierScenario.Instance.warnedZero = true;
+						contractModifierScenario.Instance.CMNode.WarnedZero = true;
 						contractModifierScenario.Instance.allowZero = true;
 					}
 				}
@@ -816,6 +816,7 @@ namespace ContractModifier
 					{
 						dropDown = false;
 						activePopup = false;
+						contractModifierScenario.Instance.CMNode.WarnedAlterActive = true;
 					}
 				}
 
