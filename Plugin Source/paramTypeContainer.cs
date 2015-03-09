@@ -36,13 +36,24 @@ using UnityEngine;
 
 namespace ContractModifier
 {
-	public class paramTypeContainer
+	public class paramTypeContainer : DMCM_ConfigNodeStorage
 	{
+		[Persistent]
+		private string typeName = "";
+		[Persistent]
+		private float fundReward = 1.0f;
+		[Persistent]
+		private float fundPenalty = 1.0f;
+		[Persistent]
+		private float repReward = 1.0f;
+		[Persistent]
+		private float repPenalty = 1.0f;
+		[Persistent]
+		private float scienceReward = 1.0f;
+
 		private Type paramType;
 		private ContractParameter param = null;
 		private string name;
-		private string typeName;
-		private float rewardFund, penaltyFund, rewardRep, penaltyRep, rewardScience;
 		private float[] paramValues = new float[5];
 		private ConfigNode parameterTypeNode;
 
@@ -60,19 +71,19 @@ namespace ContractModifier
 			}
 			typeName = PType.Name;
 			name = displayName(typeName);
-			rewardFund = penaltyFund = rewardRep = penaltyRep = rewardScience = 1f;
-			parameterTypeNode = createNode();
+			fundReward = fundPenalty = repReward = repPenalty = scienceReward = 1f;
+			parameterTypeNode = this.AsConfigNode;
 		}
 
 		internal paramTypeContainer (string N, float FRew, float FPen, float RRew, float RPen, float SRew, ConfigNode node)
 		{
 			typeName = N;
 			name = displayName(N);
-			rewardFund = FRew;
-			penaltyFund = FPen;
-			rewardRep = RRew;
-			penaltyRep = RPen;
-			rewardScience = SRew;
+			fundReward = FRew;
+			fundPenalty = FPen;
+			repReward = RRew;
+			repPenalty = RPen;
+			scienceReward = SRew;
 			parameterTypeNode = node;
 		}
 
@@ -80,11 +91,11 @@ namespace ContractModifier
 		{
 			ConfigNode pNode = new ConfigNode("PARAMETER_TYPE_CONFIG");
 			pNode.AddValue("name", typeName);
-			pNode.AddValue("fundsReward", rewardFund);
-			pNode.AddValue("fundsPenalty", penaltyFund);
-			pNode.AddValue("repReward", rewardRep);
-			pNode.AddValue("repPenalty", penaltyRep);
-			pNode.AddValue("scienceReward", rewardScience);
+			pNode.AddValue("fundsReward", fundReward);
+			pNode.AddValue("fundsPenalty", fundPenalty);
+			pNode.AddValue("repReward", repReward);
+			pNode.AddValue("repPenalty", repPenalty);
+			pNode.AddValue("scienceReward", scienceReward);
 
 			return pNode;
 		}
@@ -121,7 +132,7 @@ namespace ContractModifier
 
 		public float RewardFund
 		{
-			get { return rewardFund; }
+			get { return fundReward; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -133,14 +144,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					rewardFund = value;
+					fundReward = value;
 				}
 			}
 		}
 
 		public float PenaltyFund
 		{
-			get { return penaltyFund; }
+			get { return fundPenalty; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -152,14 +163,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					penaltyFund = value;
+					fundPenalty = value;
 				}
 			}
 		}
 
 		public float RewardRep
 		{
-			get { return rewardRep; }
+			get { return repReward; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -171,14 +182,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					rewardRep = value;
+					repReward = value;
 				}
 			}
 		}
 
 		public float PenaltyRep
 		{
-			get { return penaltyRep; }
+			get { return repPenalty; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -190,14 +201,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					penaltyRep = value;
+					repPenalty = value;
 				}
 			}
 		}
 
 		public float RewardScience
 		{
-			get { return rewardScience; }
+			get { return scienceReward; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -209,7 +220,7 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					rewardScience = value;
+					scienceReward = value;
 				}
 			}
 		}
@@ -218,11 +229,11 @@ namespace ContractModifier
 		{
 			get
 			{
-				paramValues[0] = rewardFund;
-				paramValues[1] = penaltyFund;
-				paramValues[2] = rewardRep;
-				paramValues[3] = penaltyRep;
-				paramValues[4] = rewardScience;
+				paramValues[0] = fundReward;
+				paramValues[1] = fundPenalty;
+				paramValues[2] = repReward;
+				paramValues[3] = repPenalty;
+				paramValues[4] = scienceReward;
 				return paramValues;
 			}
 		}

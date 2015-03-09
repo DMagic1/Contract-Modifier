@@ -39,14 +39,32 @@ namespace ContractModifier
 {
 	public class contractTypeContainer : DMCM_ConfigNodeStorage
 	{
-		private Type contractType;
-		private string name = "";
+		[Persistent]
 		private string typeName = "";
-		private Contract contractC = null;
-		private float rewardFund, penaltyFund, advanceFund, rewardRep, penaltyRep, rewardScience, durationTime, expirationTime;
-		private float maxOffer, maxActive;
+		[Persistent]
+		private float fundReward;
+		[Persistent]
+		private float fundPenalty = 1.0f;
+		[Persistent]
+		private float fundAdvance = 1.0f;
+		[Persistent]
+		private float repReward = 1.0f;
+		[Persistent]
+		private float repPenalty = 1.0f;
+		[Persistent]
+		private float scienceReward = 1.0f;
+		[Persistent]
+		private float durationTime = 1.0f;
+		[Persistent]
+		private float maxOffer = 100;
+		[Persistent]
+		private float maxActive = 100;
+
 		private float[] contractValues = new float[9];
 		private ConfigNode contractTypeNode;
+		private Type contractType;
+		private string name = "";
+		private Contract contractC = null;
 
 		internal contractTypeContainer (Type CType)
 		{
@@ -63,21 +81,21 @@ namespace ContractModifier
 			typeName = CType.Name;
 			name = typeName;
 			name = displayName(name);
-			rewardFund = penaltyFund = advanceFund = rewardRep = penaltyRep = rewardScience = durationTime = expirationTime = 1f;
-			maxOffer = maxActive = 10f;
-			contractTypeNode = createNode();
+			maxOffer /= 10f;
+			maxActive /= 10f;
+			contractTypeNode = this.AsConfigNode;
 		}
 
 		internal contractTypeContainer (string N, float FRew, float FAdv, float FPen, float RRew, float RPen, float SRew, float Off, float Act, ConfigNode node )
 		{
 			typeName = N;
 			name = displayName(N);
-			rewardFund = FRew;
-			advanceFund = FAdv;
-			penaltyFund = FPen;
-			rewardRep = RRew;
-			penaltyRep = RPen;
-			rewardScience = SRew;
+			fundReward = FRew;
+			fundAdvance = FAdv;
+			fundPenalty = FPen;
+			repReward = RRew;
+			repPenalty = RPen;
+			scienceReward = SRew;
 			maxOffer = Off / 10f;
 			maxActive = Act / 10f;
 			contractTypeNode = node;
@@ -87,12 +105,12 @@ namespace ContractModifier
 		{
 			ConfigNode cNode = new ConfigNode("CONTRACT_TYPE_CONFIG");
 			cNode.AddValue("name", typeName);
-			cNode.AddValue("fundsReward", rewardFund);
-			cNode.AddValue("fundsAdvance", advanceFund);
-			cNode.AddValue("fundsPenalty", penaltyFund);
-			cNode.AddValue("repReward", rewardRep);
-			cNode.AddValue("repPenalty", penaltyRep);
-			cNode.AddValue("scienceReward", rewardScience);
+			cNode.AddValue("fundsReward", fundReward);
+			cNode.AddValue("fundsAdvance", fundAdvance);
+			cNode.AddValue("fundsPenalty", fundPenalty);
+			cNode.AddValue("repReward", repReward);
+			cNode.AddValue("repPenalty", repPenalty);
+			cNode.AddValue("scienceReward", scienceReward);
 			cNode.AddValue("maxOffered", maxOffer * 10f);
 			cNode.AddValue("maxActive", maxActive * 10f);
 
@@ -131,7 +149,7 @@ namespace ContractModifier
 
 		public float RewardFund
 		{
-			get { return rewardFund; }
+			get { return fundReward; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -143,14 +161,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					rewardFund = value;
+					fundReward = value;
 				}
 			}
 		}
 
 		public float PenaltyFund
 		{
-			get { return penaltyFund; }
+			get { return fundPenalty; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -162,14 +180,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					penaltyFund = value;
+					fundPenalty = value;
 				}
 			}
 		}
 
 		public float AdvanceFund
 		{
-			get { return advanceFund; }
+			get { return fundAdvance; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -181,14 +199,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					advanceFund = value;
+					fundAdvance = value;
 				}
 			}
 		}
 
 		public float RewardRep
 		{
-			get { return rewardRep; }
+			get { return repReward; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -200,14 +218,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					rewardRep = value;
+					repReward = value;
 				}
 			}
 		}
 
 		public float PenaltyRep
 		{
-			get { return penaltyRep; }
+			get { return repPenalty; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -219,14 +237,14 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					penaltyRep = value;
+					repPenalty = value;
 				}
 			}
 		}
 
 		public float RewardScience
 		{
-			get { return rewardScience; }
+			get { return scienceReward; }
 			set
 			{
 				if (value >= 0 && value <= 10)
@@ -238,7 +256,7 @@ namespace ContractModifier
 					}
 					if (value == 0.00f)
 						value = 0.0000000001f;
-					rewardScience = value;
+					scienceReward = value;
 				}
 			}
 		}
@@ -258,25 +276,6 @@ namespace ContractModifier
 					if (value == 0.00f)
 						value = 0.0000000001f;
 					durationTime = value;
-				}
-			}
-		}
-
-		public float ExpirationTime
-		{
-			get { return expirationTime; }
-			set
-			{
-				if (value > 0 && value <= 10)
-				{
-					if (contractModifierScenario.Instance != null)
-					{
-						if (!contractModifierScenario.Instance.allowZero && value == 0.00f)
-							value = 0.001f;
-					}
-					if (value == 0.00f)
-						value = 0.0000000001f;
-					expirationTime = value;
 				}
 			}
 		}
@@ -305,12 +304,12 @@ namespace ContractModifier
 		{
 			get
 			{
-				contractValues[0] = rewardFund;
-				contractValues[1] = advanceFund;
-				contractValues[2] = penaltyFund;
-				contractValues[3] = rewardRep;
-				contractValues[4] = penaltyRep;
-				contractValues[5] = rewardScience;
+				contractValues[0] = fundReward;
+				contractValues[1] = fundAdvance;
+				contractValues[2] = fundPenalty;
+				contractValues[3] = repReward;
+				contractValues[4] = repPenalty;
+				contractValues[5] = scienceReward;
 				contractValues[6] = durationTime;
 				contractValues[7] = maxOffer;
 				contractValues[8] = maxActive;
