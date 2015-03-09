@@ -37,16 +37,10 @@ namespace ContractModifier
 
 		[KSPField(isPersistant = true)]
 		public string version = "1.0";
-		[KSPField(isPersistant = true)]
-		public bool warnedZero;
-		[KSPField(isPersistant = true)]
+
 		public bool allowZero;
-		[KSPField(isPersistant = true)]
 		public bool alterActive;
-		[KSPField(isPersistant = true)]
 		public bool stockToolbar;
-		[KSPField(isPersistant = true)]
-		public bool noToolbar = false;
 
 		internal cmStockToolbar appLauncherButton;
 		internal cmToolbar blizzyToolbarButton;
@@ -72,7 +66,7 @@ namespace ContractModifier
 			onParamChange.Add(paramChanged);
 			GameEvents.Contract.onOffered.Add(contractOffered);
 
-			if (!noToolbar)
+			if (cmNode.ShowToolbar)
 			{
 				if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 				{
@@ -94,6 +88,16 @@ namespace ContractModifier
 		public override void OnLoad(ConfigNode node)
 		{
 			cmNode = cmConfigLoad.TopNode;
+			if (cmNode == null)
+				cmNode = new contractModifierNode(cmConfigLoad.fileName);
+
+			allowZero = cmNode.AllowZero;
+			alterActive = cmNode.AlterActive;
+			stockToolbar = cmNode.StockToolbar;
+
+			bool.TryParse(node.GetValue("allowZero"), out allowZero);
+			bool.TryParse(node.GetValue("alterActive"), out alterActive);
+			bool.TryParse(node.GetValue("stockToolbar"), out stockToolbar);
 
 			try
 			{
@@ -184,7 +188,7 @@ namespace ContractModifier
 				DMCM_MBE.LogFormatted("Parameter Type List Cannot Be Generated Or Loaded: {0}", e);
 			}
 
-			if (!noToolbar)
+			if (cmNode.ShowToolbar)
 			{
 				//Start the window object
 				try
@@ -196,10 +200,20 @@ namespace ContractModifier
 					DMCM_MBE.LogFormatted("Contract Modifier Windows Cannot Be Started: {0}", e);
 				}
 			}
+
+			if (cmNode.getCType("GlobalSettings") == null)
+				cmNode.addToContractList(new contractTypeContainer("GlobalSettings"));
+
+			if (cmNode.getPType("GlobalSettings") == null)
+				cmNode.addToParamList(new paramTypeContainer("GlobalSettings"));
 		}
 
 		public override void OnSave(ConfigNode node)
 		{
+			node.AddValue("allowZero", allowZero);
+			node.AddValue("alterActive", alterActive);
+			node.AddValue("stockToolbar", stockToolbar);
+
 			try
 			{
 				ConfigNode contractTypes = new ConfigNode("Contracts_Window_Contract_Types");
@@ -475,15 +489,24 @@ namespace ContractModifier
 		public List<paramTypeContainer> setParamTypes(List<paramTypeContainer> pList)
 		{
 			pList = new List<paramTypeContainer>();
+			List<paramTypeContainer> sortList = new List<paramTypeContainer>();
 			for (int i = 0; i < cmNode.ParameterTypeCount; i++)
 			{
 				paramTypeContainer p = cmNode.getPType(i);
 				if (p != null)
-					pList.Add(p);
+				{
+					if (p.Generic)
+						pList.Add(p);
+					else
+						sortList.Add(p);
+				}
 			}
 
-			if (pList.Count > 0)
-				pList.Sort((a, b) => string.Compare(a.Name, b.Name));
+			if (sortList.Count > 0)
+			{
+				sortList.Sort((a, b) => string.Compare(a.Name, b.Name));
+				pList.AddRange(sortList);
+			}
 
 			return pList;
 		}
@@ -491,15 +514,24 @@ namespace ContractModifier
 		public List<contractTypeContainer> setContractTypes(List<contractTypeContainer> cList)
 		{
 			cList = new List<contractTypeContainer>();
+			List<contractTypeContainer> sortList = new List<contractTypeContainer>();
 			for (int i = 0; i < cmNode.ContractTypeCount; i++)
 			{
 				contractTypeContainer c = cmNode.getCType(i);
 				if (c != null)
-					cList.Add(c);
+				{
+					if (c.Generic)
+						cList.Add(c);
+					else
+						sortList.Add(c);
+				}
 			}
 
-			if (cList.Count > 0)
-				cList.Sort((a, b) => string.Compare(a.Name, b.Name));
+			if (sortList.Count > 0)
+			{
+				sortList.Sort((a, b) => string.Compare(a.Name, b.Name));
+				cList.AddRange(sortList);
+			}
 
 			return cList;
 		}
