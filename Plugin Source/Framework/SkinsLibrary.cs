@@ -8,9 +8,7 @@ License: The MIT License (MIT)
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using KSP;
 using UnityEngine;
 
 namespace ContractModifier.Framework
