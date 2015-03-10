@@ -495,7 +495,7 @@ namespace ContractModifier
 				paramTypeContainer p = cmNode.getPType(i);
 				if (p != null)
 				{
-					if (p.Generic)
+					if (p.Generic && pList.Count == 0)
 						pList.Add(p);
 					else
 						sortList.Add(p);
@@ -520,7 +520,7 @@ namespace ContractModifier
 				contractTypeContainer c = cmNode.getCType(i);
 				if (c != null)
 				{
-					if (c.Generic)
+					if (c.Generic && cList.Count == 0)
 						cList.Add(c);
 					else
 						sortList.Add(c);
