@@ -6,7 +6,7 @@ using ContractModifier.Framework;
 
 namespace ContractModifier
 {
-	public class contractModifierNode : DMCM_ConfigNodeStorage
+	public class ContractValuesNode : DMCM_ConfigNodeStorage
 	{
 		[Persistent]
 		private string version = "";
@@ -24,18 +24,53 @@ namespace ContractModifier
 		private bool warnedToolbar = false;
 		[Persistent]
 		private bool warnedAlterActive = false;
+		[Persistent]
+		private List<contractTypeContainer> ContractTypeConfigs = new List<contractTypeContainer>();
+		[Persistent]
+		private List<paramTypeContainer> ParameterTypeConfigs = new List<paramTypeContainer>();
 
 		private Dictionary<string, contractTypeContainer> masterContractList = new Dictionary<string, contractTypeContainer>();
 		private Dictionary<string, paramTypeContainer> masterParamList = new Dictionary<string, paramTypeContainer>();
 
-		internal contractModifierNode(string filePath)
+		public override void OnDecodeFromConfigNode()
 		{
+			LogFormatted_DebugOnly("Start On Decode Method");
+			try
+			{
+				masterContractList = ContractTypeConfigs.ToDictionary(a => a.TypeName, a => a);
+				LogFormatted_DebugOnly("Contract Dict Loaded; {0} Objects", masterContractList.Count);
+			}
+			catch (Exception e)
+			{
+				LogFormatted("Error while loading contract container list; possibly a duplicate entry: {0}", e);
+			}
+
+			try
+			{
+				masterParamList = ParameterTypeConfigs.ToDictionary(a => a.TypeName, a => a);
+				LogFormatted_DebugOnly("Parameter Dict Loaded; {0} Objects", masterParamList.Count);
+			}
+			catch (Exception e)
+			{
+				LogFormatted("Error while loading contract container list; possibly a duplicate entry: {0}", e);
+			}
+		}
+
+		internal ContractValuesNode(string filePath)
+		{
+			LogFormatted_DebugOnly("Create new config object");
 			FilePath = filePath;
 
 			if (Load())
+			{
+				LogFormatted_DebugOnly("Loaded From File: {0}", filePath);
 				topNode = this.AsConfigNode;
+			}
 			else
-				topNode = new ConfigNode("contractModifierNode");
+			{
+				LogFormatted_DebugOnly("Failed to load from file: {0}", filePath);
+				topNode = new ConfigNode("ContractValuesNode");
+			}
 		}
 
 		private ConfigNode topNode;
@@ -89,9 +124,9 @@ namespace ContractModifier
 
 		public bool addToContractList(contractTypeContainer c)
 		{
-			if (!masterContractList.ContainsKey(c.Name))
+			if (!masterContractList.ContainsKey(c.TypeName))
 			{
-				masterContractList.Add(c.Name, c);
+				masterContractList.Add(c.TypeName, c);
 				return true;
 			}
 			else
@@ -103,9 +138,9 @@ namespace ContractModifier
 
 		public bool addToParamList(paramTypeContainer p)
 		{
-			if (!masterParamList.ContainsKey(p.Name))
+			if (!masterParamList.ContainsKey(p.TypeName))
 			{
-				masterParamList.Add(p.Name, p);
+				masterParamList.Add(p.TypeName, p);
 				return true;
 			}
 			else
@@ -161,46 +196,51 @@ namespace ContractModifier
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	public class cmConfigLoad : DMCM_MBE
 	{
-		private static contractModifierNode topConfigNode;
-		internal const string fileName = "contractModifierConfig.cfg";
+		private static ContractValuesNode topConfigNode;
+		internal const string fileName = "ContractModifierConfig.cfg";
 
-		public static contractModifierNode TopNode
+		public static ContractValuesNode TopNode
 		{
 			get { return topConfigNode; }
 		}
 
 		protected override void Start()
 		{
-			topConfigNode = new contractModifierNode(fileName);
+			LogFormatted_DebugOnly("Start config loader");
+			topConfigNode = new ContractValuesNode(fileName);
 
-			loadConfigFile();
+			//loadConfigFile();
 		}
 
 		private void loadConfigFile()
 		{
+			LogFormatted_DebugOnly("Begin Config load...");
 			if (topConfigNode.TopNode != null)
 			{
-				foreach (ConfigNode cType in topConfigNode.TopNode.GetNodes("CONTRACT_TYPE_CONFIG"))
-				{
-					if (cType != null)
-					{
-						contractTypeContainer c = new contractTypeContainer(cType);
+				LogFormatted_DebugOnly("Top config set");
+				//foreach (ConfigNode cType in topConfigNode.TopNode.GetNodes("CONTRACT_TYPE_CONFIG"))
+				//{
+				//	LogFormatted_DebugOnly("Found Contract configs");
+				//	if (cType != null)
+				//	{
+				//		contractTypeContainer c = new contractTypeContainer(cType);
 
-						if (c.loadFromNode(topConfigNode.AllowZero))
-							topConfigNode.addToContractList(c);
-					}
-				}
+				//		if (c.loadFromNode(topConfigNode.AllowZero))
+				//			topConfigNode.addToContractList(c);
+				//	}
+				//}
 
-				foreach (ConfigNode pType in topConfigNode.TopNode.GetNodes("PARAMATER_TYPES_CONFIG"))
-				{
-					if (pType != null)
-					{
-						paramTypeContainer p = new paramTypeContainer(pType);
+				//foreach (ConfigNode pType in topConfigNode.TopNode.GetNodes("PARAMATER_TYPES_CONFIG"))
+				//{
+				//	LogFormatted_DebugOnly("Found Parameter configs");
+				//	if (pType != null)
+				//	{
+				//		paramTypeContainer p = new paramTypeContainer(pType);
 
-						if (p.loadFromNode(topConfigNode.AllowZero))
-							topConfigNode.addToParamList(p);
-					}
-				}
+				//		if (p.loadFromNode(topConfigNode.AllowZero))
+				//			topConfigNode.addToParamList(p);
+				//	}
+				//}
 			}
 		}
 
