@@ -723,11 +723,11 @@ namespace ContractModifier
 						rPPopup = !rPPopup;
 					}
 
-					//if (GUILayout.Button("Save To Config", cmSkins.configButton))
-					//{
-					//	dropDown = !dropDown;
-					//	wPopup = !wPopup;
-					//}
+					if (GUILayout.Button("Save To Config", cmSkins.configButton))
+					{
+						dropDown = !dropDown;
+						wPopup = !wPopup;
+					}
 				GUILayout.EndVertical();
 				GUILayout.Space(20);
 			GUILayout.EndHorizontal();
@@ -864,7 +864,7 @@ namespace ContractModifier
 					{
 						dropDown = false;
 						wPopup = false;
-						resetParameToDefault();
+						contractModifierScenario.Instance.CMNode.Save();
 					}
 				}
 
