@@ -67,7 +67,7 @@ namespace ContractModifier
 			//Make sure our click-through control locks are disabled
 			InputLockManager.RemoveControlLock(lockID);
 
-			DMCM_SkinsLibrary.SetCurrent("ContractUnitySkin");
+			DMCM_SkinsLibrary.SetCurrent("CMUnitySkin");
 		}
 
 		protected override void Start()
