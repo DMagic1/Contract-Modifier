@@ -56,23 +56,29 @@ namespace ContractModifier
 			get { return contractConfiguratorLoaded; }
 		}
 
-		private const string contractsWindowPlusAssemblyName = "";
-		private const string contractsPlusContractMethodName = "";
-		private const string contractsPlusParameterMethodName = "";
-		private const string contractConfiguratorAssemblyName = "";
+		private const string contractsWindowPlusTypeName = "ContractsWindow.contractUtils";
+		private const string contractsPlusContractMethodName = "UpdateContractType";
+		private const string contractsPlusParameterMethodName = "UpdateParameterType";
+		private const string contractConfiguratorTypeName = "ContractConfigurator.ContractType";
+		private const string contractConfiguratorTypeMethod = "AllValidContractTypes";
 
 		private delegate void ContractPlusUpdateContract(Type t);
 		private delegate void ContractPlusUpdateParameter(Type t);
+		private delegate void ContractConfiguratorTypes();
 
 		private static ContractPlusUpdateContract _UpdateContract;
 		private static ContractPlusUpdateParameter _UpdateParam;
+		private static ContractConfiguratorTypes _CCTypes;
 
 		private static Type CPlusType;
+
+		private static Type CConfigType;
 
 		internal static void loadReflectionMethods()
 		{
 			contractsWindowPlusContractLoaded = checkForContractsWindowPlusContractUpdate();
 			contractsWindowPlusParameterLoaded = checkForContractsWindowPlusParameterUpdate();
+			contractConfiguratorLoaded = checkForContractConfigurator();
 		}
 
 		internal static void UpdateContractValues(Type t)
@@ -93,7 +99,7 @@ namespace ContractModifier
 			try
 			{
 				CPlusType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
-					.SingleOrDefault(t => t.FullName == contractsWindowPlusAssemblyName);
+					.SingleOrDefault(t => t.FullName == contractsWindowPlusTypeName);
 
 				if (CPlusType == null)
 				{
@@ -153,6 +159,64 @@ namespace ContractModifier
 			catch (Exception e)
 			{
 				DMCM_MBE.LogFormatted("Error While Loading Contracts Window Plus Parameter Reflection Methods: {0}", e);
+			}
+
+			return false;
+		}
+
+		private static bool checkForContractConfigurator()
+		{
+			if (_CCTypes != null)
+				return true;
+
+			try
+			{
+				CConfigType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
+						.SingleOrDefault(t => t.FullName == contractConfiguratorTypeName);
+
+				if (CConfigType == null)
+				{
+					DMCM_MBE.LogFormatted("Contract Configurator Type Not Found");
+					return false;
+				}
+
+				PropertyInfo CConfigTypeProperty = CConfigType.GetProperty(contractConfiguratorTypeMethod);
+
+				if (CConfigTypeProperty == null)
+				{
+					DMCM_MBE.LogFormatted("Contract Configurator Method Not Loaded");
+					return false;
+				}
+
+				FieldInfo ccTypeName = CConfigType.GetField("name");
+
+				CConfigType.InvokeMember(contractConfiguratorTypeMethod, BindingFlags.Static | BindingFlags.GetProperty | BindingFlags.Public, null, null, null);
+
+				int counter = 0;
+
+				while (true)
+				{
+					try
+					{
+						CConfigTypeProperty.GetValue(null, new object[] { counter });
+						counter++;
+					}
+					catch
+					{
+						break;
+					}
+				}
+				for (int i = 0; i < counter; i++)
+				{
+					var ccType = CConfigTypeProperty.GetValue(null, new object[] { i });
+					var ccName = ccTypeName.GetValue(ccType);
+
+					string name = (string)ccName;
+				}
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error While Loading Contract Configurator Method: {0}", e);
 			}
 
 			return false;
