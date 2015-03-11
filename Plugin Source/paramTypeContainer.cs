@@ -51,11 +51,11 @@ namespace ContractModifier
 		[Persistent]
 		private float scienceReward = 1.0f;
 
-		private Type paramType;
+		private Type paramType = null;
 		private ContractParameter param = null;
-		private string name;
+		private string name = "";
 		private float[] paramValues = new float[5];
-		private ConfigNode parameterTypeNode;
+		private ConfigNode parameterTypeNode = null;
 		private bool generic = false;
 
 		internal paramTypeContainer (Type PType)
@@ -87,30 +87,32 @@ namespace ContractModifier
 				generic = true;
 		}
 
+		public paramTypeContainer()
+		{
+
+		}
+
 		internal paramTypeContainer (ConfigNode node)
 		{
 			parameterTypeNode = node;
 		}
 
+		public override void OnDecodeFromConfigNode()
+		{
+			loadFromNode(true);
+		}
+
 		internal bool loadFromNode(bool zero)
 		{
-			if (Load(parameterTypeNode))
-			{
-				name = displayName(typeName);
-				fundReward = fundReward.returnNonZero(zero);
-				fundPenalty = fundPenalty.returnNonZero(zero);
-				repReward = repReward.returnNonZero(zero);
-				repPenalty = repPenalty.returnNonZero(zero);
-				scienceReward = scienceReward.returnNonZero(zero);
-				if (typeName == "GlobalSettings")
-					generic = true;
-				return true;
-			}
-			else
-			{
-				LogFormatted("Error in creating parameter type container from config node; skipping...");
-				return false;
-			}
+			name = displayName(typeName);
+			fundReward = fundReward.returnNonZero(zero);
+			fundPenalty = fundPenalty.returnNonZero(zero);
+			repReward = repReward.returnNonZero(zero);
+			repPenalty = repPenalty.returnNonZero(zero);
+			scienceReward = scienceReward.returnNonZero(zero);
+			if (typeName == "GlobalSettings")
+				generic = true;
+			return true;
 		}
 
 		private string displayName(string s)

@@ -42,7 +42,7 @@ namespace ContractModifier
 		[Persistent]
 		private string typeName = "";
 		[Persistent]
-		private float fundReward;
+		private float fundReward = 1.0f;
 		[Persistent]
 		private float fundPenalty = 1.0f;
 		[Persistent]
@@ -80,7 +80,7 @@ namespace ContractModifier
 				
 			}
 			typeName = CType.Name;
-			name = displayName(name);
+			name = displayName(typeName);
 			maxOffer /= 10f;
 			maxActive /= 10f;
 			contractTypeNode = this.AsConfigNode;
@@ -99,34 +99,36 @@ namespace ContractModifier
 				generic = true;
 		}
 
+		public contractTypeContainer()
+		{
+
+		}
+
 		internal contractTypeContainer (ConfigNode node )
 		{
 			contractTypeNode = node;
 		}
 
+		public override void OnDecodeFromConfigNode()
+		{
+			loadFromNode(true);
+		}
+
 		internal bool loadFromNode(bool zero)
 		{
-			if (Load(contractTypeNode))
-			{
-				name = displayName(typeName);
-				fundReward = fundReward.returnNonZero(zero);
-				fundAdvance = fundAdvance.returnNonZero(zero);
-				fundPenalty = fundPenalty.returnNonZero(zero);
-				repReward = repReward.returnNonZero(zero);
-				repPenalty = repPenalty.returnNonZero(zero);
-				scienceReward = scienceReward.returnNonZero(zero);
-				durationTime = durationTime.returnNonZero(zero);
-				maxOffer /= 10;
-				maxActive /= 10;
-				if (typeName == "GlobalSettings")
-					generic = true;
-				return true;
-			}
-			else
-			{
-				LogFormatted("Error in creating contract type container from config node; skipping...");
-				return false;
-			}
+			name = displayName(typeName);
+			fundReward = fundReward.returnNonZero(zero);
+			fundAdvance = fundAdvance.returnNonZero(zero);
+			fundPenalty = fundPenalty.returnNonZero(zero);
+			repReward = repReward.returnNonZero(zero);
+			repPenalty = repPenalty.returnNonZero(zero);
+			scienceReward = scienceReward.returnNonZero(zero);
+			durationTime = durationTime.returnNonZero(zero);
+			maxOffer /= 10;
+			maxActive /= 10;
+			if (typeName == "GlobalSettings")
+				generic = true;
+			return true;
 		}
 
 		private string displayName (string s)
