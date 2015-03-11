@@ -67,20 +67,17 @@ namespace ContractModifier
 			onParamChange.Add(paramChanged);
 			GameEvents.Contract.onOffered.Add(contractOffered);
 
-			if (cmNode.ShowToolbar)
+			if ((stockToolbar || !ToolbarManager.ToolbarAvailable) && cmNode.ShowToolbar)
 			{
-				if (stockToolbar || !ToolbarManager.ToolbarAvailable)
-				{
-					appLauncherButton = gameObject.AddComponent<cmStockToolbar>();
-					if (blizzyToolbarButton != null)
-						Destroy(blizzyToolbarButton);
-				}
-				else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
-				{
-					blizzyToolbarButton = gameObject.AddComponent<cmToolbar>();
-					if (appLauncherButton != null)
-						Destroy(appLauncherButton);
-				}
+				appLauncherButton = gameObject.AddComponent<cmStockToolbar>();
+				if (blizzyToolbarButton != null)
+					Destroy(blizzyToolbarButton);
+			}
+			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
+			{
+				blizzyToolbarButton = gameObject.AddComponent<cmToolbar>();
+				if (appLauncherButton != null)
+					Destroy(appLauncherButton);
 			}
 		}
 
@@ -102,26 +99,6 @@ namespace ContractModifier
 
 			try
 			{
-				//Load the contract and parameter types
-				foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
-				{
-					Type[] assemblyTypes = assembly.assembly.GetTypes();
-					foreach (Type t in assemblyTypes)
-					{
-						if (t.IsSubclassOf(typeof(Contract)))
-						{
-							if (t != typeof(Contract))
-							{
-								if (cmNode.getCType(t.Name) == null)
-								{
-									if (!cmNode.addToContractList(new contractTypeContainer(t)))
-										DMCM_MBE.LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", t.Name);
-								}
-							}
-						}
-					}
-				}
-
 				ConfigNode contractTypes = node.GetNode("Contracts_Modifier_Contract_Types");
 
 				if (contractTypes != null)
@@ -144,31 +121,6 @@ namespace ContractModifier
 
 			try
 			{
-				foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
-				{
-					Type[] assemblyTypes = assembly.assembly.GetTypes();
-					foreach (Type t in assemblyTypes)
-					{
-						if (t.IsSubclassOf(typeof(ContractParameter)))
-						{
-							if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart")
-								continue;
-							if (t.IsAbstract)
-								continue;
-							if (t.IsGenericType)
-								continue;
-							if (t != typeof(ContractParameter))
-							{
-								if (cmNode.getPType(t.Name) == null)
-								{
-									if (!cmNode.addToParamList(new paramTypeContainer(t)))
-										DMCM_MBE.LogFormatted("Error During Parameter Type Loading; [{0}] Cannot Be Added To Parameter Type List", t.Name);
-								}
-							}
-						}
-					}
-				}
-
 				ConfigNode paramTypes = node.GetNode("Contracts_Window_Parameter_Types");
 
 				if (paramTypes != null)
@@ -189,17 +141,14 @@ namespace ContractModifier
 				DMCM_MBE.LogFormatted("Parameter Type List Cannot Be Generated Or Loaded: {0}", e);
 			}
 
-			if (cmNode.ShowToolbar)
+			//Start the window object
+			try
 			{
-				//Start the window object
-				try
-				{
-					configWindow = gameObject.AddComponent<contractConfig>();
-				}
-				catch (Exception e)
-				{
-					DMCM_MBE.LogFormatted("Contract Modifier Windows Cannot Be Started: {0}", e);
-				}
+				configWindow = gameObject.AddComponent<contractConfig>();
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Contract Modifier Windows Cannot Be Started: {0}", e);
 			}
 
 			if (cmNode.getCType("GlobalSettings") == null)

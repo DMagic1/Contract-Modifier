@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Contracts;
+using Contracts.Parameters;
 using ContractModifier.Framework;
 
 namespace ContractModifier
@@ -34,7 +36,6 @@ namespace ContractModifier
 
 		public override void OnDecodeFromConfigNode()
 		{
-			LogFormatted_DebugOnly("Start On Decode Method");
 			try
 			{
 				masterContractList = ContractTypeConfigs.ToDictionary(a => a.TypeName, a => a);
@@ -79,19 +80,12 @@ namespace ContractModifier
 
 		internal ContractValuesNode(string filePath)
 		{
-			LogFormatted_DebugOnly("Create new config object");
 			FilePath = filePath;
 
 			if (Load())
-			{
-				LogFormatted_DebugOnly("Loaded From File: {0}", filePath);
 				topNode = this.AsConfigNode;
-			}
 			else
-			{
-				LogFormatted_DebugOnly("Failed to load from file: {0}", filePath);
 				topNode = new ConfigNode("ContractValuesNode");
-			}
 		}
 
 		private ConfigNode topNode;
@@ -227,8 +221,73 @@ namespace ContractModifier
 
 		protected override void Start()
 		{
-			LogFormatted_DebugOnly("Start config loader");
 			topConfigNode = new ContractValuesNode(fileName);
+			loadCurrentContractTypes();
+			loadCurrentParameterTypes();
+		}
+
+		private void loadCurrentContractTypes()
+		{
+			try
+			{
+				foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
+				{
+					Type[] assemblyTypes = assembly.assembly.GetTypes();
+					foreach (Type t in assemblyTypes)
+					{
+						if (t.IsSubclassOf(typeof(Contract)))
+						{
+							if (t != typeof(Contract))
+							{
+								if (topConfigNode.getCType(t.Name) == null)
+								{
+									if (!topConfigNode.addToContractList(new contractTypeContainer(t)))
+										DMCM_MBE.LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", t.Name);
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error loading contract types: {0}", e);
+			}
+		}
+
+		private void loadCurrentParameterTypes()
+		{
+			try
+			{
+				foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
+				{
+					Type[] assemblyTypes = assembly.assembly.GetTypes();
+					foreach (Type t in assemblyTypes)
+					{
+						if (t.IsSubclassOf(typeof(ContractParameter)))
+						{
+							if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart")
+								continue;
+							if (t.IsAbstract)
+								continue;
+							if (t.IsGenericType)
+								continue;
+							if (t != typeof(ContractParameter))
+							{
+								if (topConfigNode.getPType(t.Name) == null)
+								{
+									if (!topConfigNode.addToParamList(new paramTypeContainer(t)))
+										DMCM_MBE.LogFormatted("Error During Parameter Type Loading; [{0}] Cannot Be Added To Parameter Type List", t.Name);
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error loading parameter types: {0}", e);
+			}
 		}
 	}
 }
