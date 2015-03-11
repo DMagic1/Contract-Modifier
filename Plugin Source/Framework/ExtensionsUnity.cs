@@ -85,7 +85,9 @@ namespace ContractModifier.Framework
 
 		public static float returnNonZero(this float f, bool zero)
 		{
-			if (f >= 0.001)
+			if (f >= 10)
+				return 10f;
+			else if (f >= 0.001)
 				return f;
 			else if (zero)
 				return 0.000000001f;
