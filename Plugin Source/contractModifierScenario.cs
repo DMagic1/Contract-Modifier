@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace ContractModifier
 {
+	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
 	public class contractModifierScenario : ScenarioModule
 	{
 
@@ -49,9 +50,9 @@ namespace ContractModifier
 		public static EventData<float[], contractTypeContainer> onContractChange;
 		public static EventData<float[], paramTypeContainer> onParamChange;
 
-		private contractModifierNode cmNode;
+		private ContractValuesNode cmNode;
 
-		public contractModifierNode CMNode
+		public ContractValuesNode CMNode
 		{
 			get { return cmNode; }
 		}
@@ -89,7 +90,7 @@ namespace ContractModifier
 		{
 			cmNode = cmConfigLoad.TopNode;
 			if (cmNode == null)
-				cmNode = new contractModifierNode(cmConfigLoad.fileName);
+				cmNode = new ContractValuesNode(cmConfigLoad.fileName);
 
 			allowZero = cmNode.AllowZero;
 			alterActive = cmNode.AlterActive;
