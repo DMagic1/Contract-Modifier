@@ -2,7 +2,7 @@
 /*The MIT License (MIT)
 Parameter Type Container - An object to store variables for customizing contract parameter rewards/penalties
 
-Copyright (c) 2014 DMagic
+Copyright (c) 2015 DMagic
 
 KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
 
@@ -51,11 +51,16 @@ namespace ContractModifier
 		[Persistent]
 		private float scienceReward = 1.0f;
 
+		private float defaultFundReward = 1.0f;
+		private float defaultFundPenalty = 1.0f;
+		private float defaultRepReward = 1.0f;
+		private float defaultRepPenalty = 1.0f;
+		private float defaultScienceReward = 1.0f;
+
 		private Type paramType = null;
 		private ContractParameter param = null;
 		private string name = "";
 		private float[] paramValues = new float[5];
-		private ConfigNode parameterTypeNode = null;
 		private bool generic = false;
 
 		internal paramTypeContainer (Type PType)
@@ -72,17 +77,22 @@ namespace ContractModifier
 			}
 			typeName = PType.Name;
 			name = displayName(typeName);
-			fundReward = fundPenalty = repReward = repPenalty = scienceReward = 1f;
-			parameterTypeNode = this.AsConfigNode;
-			if (typeName == "GlobalSettings")
-				generic = true;
+
+			paramTypeContainer global = cmConfigLoad.TopNode.getPType("GlobalSettings");
+			if (global != null)
+			{
+				this.defaultFundReward = this.fundReward = global.fundReward;
+				this.defaultFundPenalty = this.fundPenalty = global.fundPenalty;
+				this.defaultRepReward = this.repReward = global.repReward;
+				this.defaultRepPenalty = this.repPenalty = global.repPenalty;
+				this.defaultScienceReward = this.scienceReward = global.scienceReward;
+			}
 		}
 
 		internal paramTypeContainer (string n)
 		{
 			typeName = n;
 			name = displayName(n);
-			parameterTypeNode = this.AsConfigNode;
 			if (typeName == "GlobalSettings")
 				generic = true;
 		}
@@ -100,11 +110,12 @@ namespace ContractModifier
 		internal bool loadFromNode(bool zero)
 		{
 			name = displayName(typeName);
-			fundReward = fundReward.returnNonZero(zero);
-			fundPenalty = fundPenalty.returnNonZero(zero);
-			repReward = repReward.returnNonZero(zero);
-			repPenalty = repPenalty.returnNonZero(zero);
-			scienceReward = scienceReward.returnNonZero(zero);
+			defaultFundReward = fundReward = fundReward.returnNonZero(zero);
+			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero(zero);
+			defaultRepReward = repReward = repReward.returnNonZero(zero);
+			defaultRepPenalty = repPenalty = repPenalty.returnNonZero(zero);
+			defaultScienceReward = scienceReward = scienceReward.returnNonZero(zero);
+
 			if (typeName == "GlobalSettings")
 				generic = true;
 			return true;
@@ -118,11 +129,6 @@ namespace ContractModifier
 		public ContractParameter Param
 		{
 			get { return param; }
-		}
-
-		public ConfigNode ParamTypeNode
-		{
-			get { return parameterTypeNode; }
 		}
 
 		public bool Generic
@@ -238,6 +244,31 @@ namespace ContractModifier
 					scienceReward = value;
 				}
 			}
+		}
+
+		public float DefaultFundReward
+		{
+			get { return defaultFundReward; }
+		}
+
+		public float DefaultFundPenalty
+		{
+			get { return defaultFundPenalty; }
+		}
+
+		public float DefaultRepReward
+		{
+			get { return defaultRepReward; }
+		}
+
+		public float DefaultRepPenalty
+		{
+			get { return defaultRepPenalty; }
+		}
+
+		public float DefaultScienceReward
+		{
+			get { return defaultScienceReward; }
 		}
 
 		public float[] ParamValues

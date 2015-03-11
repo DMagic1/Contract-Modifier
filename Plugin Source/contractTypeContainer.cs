@@ -2,7 +2,7 @@
 /*The MIT License (MIT)
 Contract Type Container - An object to store variables for customizing contract rewards/penalties
 
-Copyright (c) 2014 DMagic
+Copyright (c) 2015 DMagic
 
 KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
 
@@ -56,12 +56,21 @@ namespace ContractModifier
 		[Persistent]
 		private float durationTime = 1.0f;
 		[Persistent]
-		private float maxOffer = 100;
+		private float maxOffer = 10;
 		[Persistent]
-		private float maxActive = 100;
+		private float maxActive = 10;
+
+		private float defaultFundReward = 1.0f;
+		private float defaultFundAdvance = 1.0f;
+		private float defaultFundPenalty = 1.0f;
+		private float defaultRepReward = 1.0f;
+		private float defaultRepPenalty = 1.0f;
+		private float defaultScienceReward = 1.0f;
+		private float defaultDuration = 1.0f;
+		private float defaultMaxOffer = 10f;
+		private float defaultMaxActive = 10f;
 
 		private float[] contractValues = new float[9];
-		private ConfigNode contractTypeNode;
 		private Type contractType;
 		private string name = "";
 		private Contract contractC = null;
@@ -81,11 +90,20 @@ namespace ContractModifier
 			}
 			typeName = CType.Name;
 			name = displayName(typeName);
-			maxOffer /= 10f;
-			maxActive /= 10f;
-			contractTypeNode = this.AsConfigNode;
-			if (typeName == "GlobalSettings")
-				generic = true;
+
+			contractTypeContainer global = cmConfigLoad.TopNode.getCType("GlobalSettings");
+			if (global != null)
+			{
+				this.defaultFundReward = this.fundReward = global.fundReward;
+				this.defaultFundAdvance = this.fundAdvance = global.fundAdvance;
+				this.defaultFundPenalty = this.fundPenalty = global.fundPenalty;
+				this.defaultRepReward = this.repReward = global.repReward;
+				this.defaultRepPenalty = this.repPenalty = global.repPenalty;
+				this.defaultScienceReward = this.scienceReward = global.scienceReward;
+				this.defaultDuration = this.durationTime = global.durationTime;
+				this.defaultMaxOffer = this.maxOffer = global.maxOffer;
+				this.defaultMaxActive = this.maxActive = global.maxActive;
+			}
 		}
 
 		internal contractTypeContainer (string n)
@@ -94,7 +112,6 @@ namespace ContractModifier
 			name = displayName(n);
 			maxOffer /= 10f;
 			maxActive /= 10f;
-			contractTypeNode = this.AsConfigNode;
 			if (typeName == "GlobalSettings")
 				generic = true;
 		}
@@ -112,15 +129,16 @@ namespace ContractModifier
 		internal bool loadFromNode(bool zero)
 		{
 			name = displayName(typeName);
-			fundReward = fundReward.returnNonZero(zero);
-			fundAdvance = fundAdvance.returnNonZero(zero);
-			fundPenalty = fundPenalty.returnNonZero(zero);
-			repReward = repReward.returnNonZero(zero);
-			repPenalty = repPenalty.returnNonZero(zero);
-			scienceReward = scienceReward.returnNonZero(zero);
-			durationTime = durationTime.returnNonZero(zero);
-			maxOffer /= 10;
-			maxActive /= 10;
+			defaultFundReward = fundReward = fundReward.returnNonZero(zero);
+			defaultFundAdvance = fundAdvance = fundAdvance.returnNonZero(zero);
+			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero(zero);
+			defaultRepReward = repReward = repReward.returnNonZero(zero);
+			defaultRepPenalty = repPenalty = repPenalty.returnNonZero(zero);
+			defaultScienceReward = scienceReward = scienceReward.returnNonZero(zero);
+			defaultDuration = durationTime = durationTime.returnNonZero(zero);
+			defaultMaxOffer = maxOffer = (maxOffer / 10f).returnNonZero(zero);
+			defaultMaxActive = maxActive = (maxActive / 10f).returnNonZero(zero);
+
 			if (typeName == "GlobalSettings")
 				generic = true;
 			return true;
@@ -134,11 +152,6 @@ namespace ContractModifier
 		public Contract ContractC
 		{
 			get { return contractC; }
-		}
-
-		public ConfigNode ContractTypeNode
-		{
-			get { return contractTypeNode; }
 		}
 
 		public Type ContractType
@@ -312,6 +325,51 @@ namespace ContractModifier
 				if (value >= 0 && value <= 10)
 					maxActive = value;
 			}
+		}
+
+		public float DefaultFundReward
+		{
+			get { return defaultFundReward; }
+		}
+
+		public float DefaultFundAdvance
+		{
+			get { return defaultFundAdvance; }
+		}
+
+		public float DefaultFundPenalty
+		{
+			get { return defaultFundPenalty; }
+		}
+
+		public float DefaultRepReward
+		{
+			get { return defaultRepReward; }
+		}
+
+		public float DefaultRepPenalty
+		{
+			get { return defaultRepPenalty; }
+		}
+
+		public float DefaultScienceReward
+		{
+			get { return defaultScienceReward; }
+		}
+
+		public float DefaultDuration
+		{
+			get { return defaultDuration; }
+		}
+
+		public float DefaultMaxOffer
+		{
+			get { return defaultMaxOffer; }
+		}
+
+		public float DefaultMaxActive
+		{
+			get { return defaultMaxActive; }
 		}
 
 		public float[] ContractValues
