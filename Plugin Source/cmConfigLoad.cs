@@ -56,6 +56,27 @@ namespace ContractModifier
 			}
 		}
 
+		public override void OnEncodeToConfigNode()
+		{
+			try
+			{
+				ContractTypeConfigs = masterContractList.Values.ToList();
+			}
+			catch (Exception e)
+			{
+				LogFormatted("Error while saving contract container list: {0}", e);
+			}
+
+			try
+			{
+				ParameterTypeConfigs = masterParamList.Values.ToList();
+			}
+			catch (Exception e)
+			{
+				LogFormatted("Error while saving parameter container list: {0}", e);
+			}
+		}
+
 		internal ContractValuesNode(string filePath)
 		{
 			LogFormatted_DebugOnly("Create new config object");
