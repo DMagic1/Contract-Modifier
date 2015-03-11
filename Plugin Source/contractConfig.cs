@@ -705,7 +705,7 @@ namespace ContractModifier
 					if (ToolbarManager.ToolbarAvailable)
 						contractModifierScenario.Instance.stockToolbar = GUILayout.Toggle(contractModifierScenario.Instance.stockToolbar, "Use Stock Toolbar", cmSkins.configToggle);
 
-					contractModifierScenario.Instance.CMNode.ShowToolbar = GUILayout.Toggle(contractModifierScenario.Instance.CMNode.ShowToolbar, "Disable All Toolbars", cmSkins.configToggle);
+					contractModifierScenario.Instance.CMNode.ShowToolbar = GUILayout.Toggle(!contractModifierScenario.Instance.CMNode.ShowToolbar, "Disable All Toolbars", cmSkins.configToggle);
 				GUILayout.EndVertical();
 
 				GUILayout.Space(20);
