@@ -11,6 +11,8 @@ namespace ContractModifier
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	class cmSkins : DMCM_MBE
 	{
+		internal static GUISkin cmUnitySkin;
+
 		internal static GUIStyle newWindowStyle;
 		internal static GUIStyle resetBox;
 		internal static GUIStyle dropDown;
@@ -40,6 +42,9 @@ namespace ContractModifier
 			verticalBar = GameDatabase.Instance.GetTexture("ContractModifier/Textures/VerticalBar", false);
 			toolbarIcon = GameDatabase.Instance.GetTexture("ContractModifier/Textures/ContractsIconApp", false);
 			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
+
+			cmUnitySkin = DMCM_SkinsLibrary.CopySkin(DMCM_SkinsLibrary.DefSkinType.Unity);
+			DMCM_SkinsLibrary.AddSkin("CMUnitySkin", cmUnitySkin);
 
 			newWindowStyle = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.window);
 			newWindowStyle.name = "WindowStyle";
@@ -118,6 +123,10 @@ namespace ContractModifier
 			configCenterLabel = new GUIStyle(configLabel);
 			configCenterLabel.name = "ConfigCenterLabel";
 			configCenterLabel.alignment = TextAnchor.MiddleCenter;
+
+			DMCM_SkinsLibrary.List["CMUnitySkin"].window = new GUIStyle(newWindowStyle);
+
+			DMCM_SkinsLibrary.AddStyle("CMUnitySkin", newWindowStyle);
 		}
 
 	}
