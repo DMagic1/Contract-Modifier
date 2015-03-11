@@ -2,7 +2,7 @@
 /*The MIT License (MIT)
 Contract Config - Addon to control contract config options
 
-Copyright (c) 2014 DMagic
+Copyright (c) 2015 DMagic
 
 KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
 
@@ -1044,15 +1044,16 @@ namespace ContractModifier
 		private void resetContractToDefault()
 		{
 			float[] originals = (float[])contractType.ContractValues.Clone();
-			contractType.RewardFund = 1f;
-			contractType.AdvanceFund = 1f;
-			contractType.PenaltyFund = 1f;
-			contractType.RewardRep = 1f;
-			contractType.PenaltyRep = 1f;
-			contractType.RewardScience = 1f;
-			contractType.DurationTime = 1f;
-			contractType.MaxOffer = 10f;
-			contractType.MaxActive = 10f;
+			contractType.RewardFund = contractType.DefaultFundReward;
+			contractType.AdvanceFund = contractType.DefaultFundAdvance;
+			contractType.PenaltyFund = contractType.DefaultFundPenalty;
+			contractType.RewardRep = contractType.DefaultRepReward;
+			contractType.PenaltyRep = contractType.DefaultRepPenalty;
+			contractType.RewardScience = contractType.DefaultScienceReward;
+			contractType.DurationTime = contractType.DefaultDuration;
+			contractType.MaxOffer = contractType.DefaultMaxOffer;
+			contractType.MaxActive = contractType.DefaultMaxActive;
+
 			setContractType(contractType, contractModifierScenario.Instance.allowZero);
 			if (contractModifierScenario.Instance.alterActive)
 				contractModifierScenario.onContractChange.Fire(originals, contractType);
@@ -1062,11 +1063,12 @@ namespace ContractModifier
 		private void resetParameToDefault()
 		{
 			float[] originals = (float[])paramType.ParamValues.Clone();
-			paramType.RewardFund = 1f;
-			paramType.PenaltyFund = 1f;
-			paramType.RewardRep = 1f;
-			paramType.PenaltyRep = 1f;
-			paramType.RewardScience = 1f;
+			paramType.RewardFund = paramType.DefaultFundReward;
+			paramType.PenaltyFund = paramType.DefaultFundPenalty;
+			paramType.RewardRep = paramType.DefaultRepReward;
+			paramType.PenaltyRep = paramType.DefaultRepPenalty;
+			paramType.RewardScience = paramType.DefaultScienceReward;
+
 			setParameterType(paramType, contractModifierScenario.Instance.allowZero);
 			if (contractModifierScenario.Instance.alterActive)
 				contractModifierScenario.onParamChange.Fire(originals, paramType);
