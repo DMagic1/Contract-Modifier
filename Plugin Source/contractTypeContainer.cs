@@ -104,11 +104,6 @@ namespace ContractModifier
 
 		}
 
-		internal contractTypeContainer (ConfigNode node )
-		{
-			contractTypeNode = node;
-		}
-
 		public override void OnDecodeFromConfigNode()
 		{
 			loadFromNode(true);

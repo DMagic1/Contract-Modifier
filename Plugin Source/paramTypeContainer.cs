@@ -92,11 +92,6 @@ namespace ContractModifier
 
 		}
 
-		internal paramTypeContainer (ConfigNode node)
-		{
-			parameterTypeNode = node;
-		}
-
 		public override void OnDecodeFromConfigNode()
 		{
 			loadFromNode(true);

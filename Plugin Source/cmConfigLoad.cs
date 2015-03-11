@@ -208,47 +208,6 @@ namespace ContractModifier
 		{
 			LogFormatted_DebugOnly("Start config loader");
 			topConfigNode = new ContractValuesNode(fileName);
-
-			//loadConfigFile();
-		}
-
-		private void loadConfigFile()
-		{
-			LogFormatted_DebugOnly("Begin Config load...");
-			if (topConfigNode.TopNode != null)
-			{
-				LogFormatted_DebugOnly("Top config set");
-				//foreach (ConfigNode cType in topConfigNode.TopNode.GetNodes("CONTRACT_TYPE_CONFIG"))
-				//{
-				//	LogFormatted_DebugOnly("Found Contract configs");
-				//	if (cType != null)
-				//	{
-				//		contractTypeContainer c = new contractTypeContainer(cType);
-
-				//		if (c.loadFromNode(topConfigNode.AllowZero))
-				//			topConfigNode.addToContractList(c);
-				//	}
-				//}
-
-				//foreach (ConfigNode pType in topConfigNode.TopNode.GetNodes("PARAMATER_TYPES_CONFIG"))
-				//{
-				//	LogFormatted_DebugOnly("Found Parameter configs");
-				//	if (pType != null)
-				//	{
-				//		paramTypeContainer p = new paramTypeContainer(pType);
-
-				//		if (p.loadFromNode(topConfigNode.AllowZero))
-				//			topConfigNode.addToParamList(p);
-				//	}
-				//}
-			}
-		}
-
-		private float stringFloatParse(string s, float defVal)
-		{
-			float f;
-			if (float.TryParse(s, out f)) return f;
-			return defVal;
 		}
 	}
 }
