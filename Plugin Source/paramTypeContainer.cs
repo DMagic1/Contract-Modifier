@@ -80,7 +80,7 @@ namespace ContractModifier
 			typeName = PType.Name;
 			name = displayName(typeName);
 
-			paramTypeContainer global = cmConfigLoad.TopNode.getPType("GlobalSettings");
+			paramTypeContainer global = ContractValuesNode.getPType("GlobalSettings");
 			if (global != null)
 				setValuesToGlobal(global);
 
@@ -103,7 +103,7 @@ namespace ContractModifier
 
 				paramType = ContractValuesNode.getParameterType(typeName);
 
-				paramTypeContainer global = cmConfigLoad.TopNode.getPType("GlobalSettings");
+				paramTypeContainer global = ContractValuesNode.getPType("GlobalSettings");
 				if (global != null)
 					setValuesToGlobal(global);
 			}

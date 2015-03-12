@@ -191,10 +191,10 @@ namespace ContractModifier
 				DMCM_MBE.LogFormatted("Contract Modifier Windows Cannot Be Started: {0}", e);
 			}
 
-			if (cmNode.getCType("GlobalSettings") == null)
+			if (ContractValuesNode.getCType("GlobalSettings") == null)
 				cmNode.addToContractList(new contractTypeContainer("GlobalSettings", false));
 
-			if (cmNode.getPType("GlobalSettings") == null)
+			if (ContractValuesNode.getPType("GlobalSettings") == null)
 				cmNode.addToParamList(new paramTypeContainer("GlobalSettings"));
 		}
 
@@ -212,9 +212,9 @@ namespace ContractModifier
 			{
 				ConfigNode contractTypes = new ConfigNode("Contracts_Window_Contract_Types");
 
-				for (int i = 0; i < cmNode.ContractTypeCount; i++ )
+				for (int i = 0; i < ContractValuesNode.ContractTypeCount; i++)
 				{
-					contractTypeContainer c = cmNode.getCType(i);
+					contractTypeContainer c = ContractValuesNode.getCType(i);
 					if (c != null)
 					{
 						ConfigNode contractType = new ConfigNode("Contract_Type");
@@ -238,9 +238,9 @@ namespace ContractModifier
 			{
 				ConfigNode paramTypes = new ConfigNode("Contracts_Window_Parameter_Types");
 
-				for (int i = 0; i < cmNode.ParameterTypeCount; i++ )
+				for (int i = 0; i < ContractValuesNode.ParameterTypeCount; i++)
 				{
-					paramTypeContainer p = cmNode.getPType(i);
+					paramTypeContainer p = ContractValuesNode.getPType(i);
 
 					if (p != null)
 					{
@@ -293,7 +293,7 @@ namespace ContractModifier
 
 		private void stringContractParse(string s, string type)
 		{
-			contractTypeContainer c = cmNode.getCType(type);
+			contractTypeContainer c = ContractValuesNode.getCType(type);
 
 			if (c == null)
 			{
@@ -316,7 +316,7 @@ namespace ContractModifier
 
 		private void stringParamParse(string s, string type)
 		{
-			paramTypeContainer p = cmNode.getPType(type);
+			paramTypeContainer p = ContractValuesNode.getPType(type);
 
 			if (p == null)
 			{
@@ -349,7 +349,7 @@ namespace ContractModifier
 		private void contractOffered(Contract c)
 		{
 			Type contractT = c.GetType();
-			contractTypeContainer cC = cmNode.getCType(contractT.Name);
+			contractTypeContainer cC = ContractValuesNode.getCType(contractT.Name);
 			if (cC == null)
 				return;
 
@@ -481,7 +481,7 @@ namespace ContractModifier
 					for (int i = 0; i < cParams.Count(); i++)
 					{
 						string name = cParams.ElementAt(i).GetType().Name;
-						paramTypeContainer p = cmNode.getPType(name);
+						paramTypeContainer p = ContractValuesNode.getPType(name);
 						if (p != null)
 						{
 							updateParameterValues(p, new List<ContractParameter>() { cParams.ElementAt(i) }, new float[5] { 1, 1, 1, 1, 1 });
@@ -498,9 +498,9 @@ namespace ContractModifier
 			pList = new List<paramTypeContainer>();
 			List<paramTypeContainer> sortList = new List<paramTypeContainer>();
 			List<paramTypeContainer> pConfiguratorList = new List<paramTypeContainer>();
-			for (int i = 0; i < cmNode.ParameterTypeCount; i++)
+			for (int i = 0; i < ContractValuesNode.ParameterTypeCount; i++)
 			{
-				paramTypeContainer p = cmNode.getPType(i);
+				paramTypeContainer p = ContractValuesNode.getPType(i);
 				if (p != null)
 				{
 					if (p.Generic && pList.Count == 0)
@@ -532,9 +532,9 @@ namespace ContractModifier
 			cList = new List<contractTypeContainer>();
 			List<contractTypeContainer> sortList = new List<contractTypeContainer>();
 			List<contractTypeContainer> cConfiguratorList = new List<contractTypeContainer>();
-			for (int i = 0; i < cmNode.ContractTypeCount; i++)
+			for (int i = 0; i < ContractValuesNode.ContractTypeCount; i++)
 			{
-				contractTypeContainer c = cmNode.getCType(i);
+				contractTypeContainer c = ContractValuesNode.getCType(i);
 				if (c != null)
 				{
 					if (c.Generic && cList.Count == 0)

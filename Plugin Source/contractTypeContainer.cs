@@ -93,7 +93,7 @@ namespace ContractModifier
 			typeName = CType.Name;
 			name = displayName(typeName);
 
-			contractTypeContainer global = cmConfigLoad.TopNode.getCType("GlobalSettings");
+			contractTypeContainer global = ContractValuesNode.getCType("GlobalSettings");
 			if (global != null)
 				setValuesToGlobal(global);
 		}
@@ -112,7 +112,7 @@ namespace ContractModifier
 				else
 					contractType = ContractValuesNode.getContractType("ConfiguredContract");
 
-				contractTypeContainer global = cmConfigLoad.TopNode.getCType("GlobalSettings");
+				contractTypeContainer global = ContractValuesNode.getCType("GlobalSettings");
 				if (global != null)
 					setValuesToGlobal(global);
 			}
@@ -138,10 +138,8 @@ namespace ContractModifier
 			defaultRepPenalty = repPenalty = repPenalty.returnNonZero();
 			defaultScienceReward = scienceReward = scienceReward.returnNonZero();
 			defaultDuration = durationTime = durationTime.returnNonZero();
-			MaxOffer = (maxOffer / 10f);
-			defaultMaxOffer = maxOffer;
-			MaxActive = (maxActive / 10f);
-			defaultMaxActive = maxActive;
+			defaultMaxOffer = maxOffer = (maxOffer / 10f).returnNonZero();
+			defaultMaxActive = maxActive = (maxActive / 10f).returnNonZero();
 
 			if (typeName == "GlobalSettings")
 				generic = true;
