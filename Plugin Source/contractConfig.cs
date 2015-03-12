@@ -882,7 +882,7 @@ namespace ContractModifier
 
 					r.x += 100;
 					r.y += 30;
-					r.width = 50;
+					r.width = 70;
 					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
 					{
 						dropDown = false;
@@ -906,7 +906,7 @@ namespace ContractModifier
 
 					r.x += 100;
 					r.y += 30;
-					r.width = 50;
+					r.width = 70;
 					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
 					{
 						dropDown = false;
@@ -1000,11 +1000,11 @@ namespace ContractModifier
 			{
 				if (Mathf.RoundToInt(originals[pos] * 100) != Mathf.RoundToInt(newF * 100))
 				{
-					if (type == 0)
+					if (type == 0 && !contractType.Generic)
 					{
 						contractModifierScenario.onContractChange.Fire(originals, contractType);
 					}
-					else if (type == 1)
+					else if (type == 1 && !paramType.Generic)
 					{
 						contractModifierScenario.onParamChange.Fire(originals, paramType);
 					}
