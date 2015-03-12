@@ -105,6 +105,17 @@ namespace ContractModifier
 			{
 				LogFormatted("Error while saving parameter container list: {0}", e);
 			}
+
+			if (contractModifierScenario.Instance != null)
+			{
+				showToolbar = contractModifierScenario.Instance.showToolbar;
+				stockToolbar = contractModifierScenario.Instance.stockToolbar;
+				allowZero = contractModifierScenario.Instance.allowZero;
+				alterActive = contractModifierScenario.Instance.alterActive;
+				warnedAlterActive = contractModifierScenario.Instance.warnedAlterActive;
+				warnedToolbar = contractModifierScenario.Instance.warnedToolbar;
+				warnedZero = contractModifierScenario.Instance.warnedZero;
+			}
 		}
 
 		internal ContractValuesNode(string filePath)
@@ -326,43 +337,36 @@ namespace ContractModifier
 		public bool ShowToolbar
 		{
 			get { return showToolbar; }
-			internal set { showToolbar = value; }
 		}
 
 		public bool AllowZero
 		{
 			get { return allowZero; }
-			internal set { allowZero = value; }
 		}
 
 		public bool AlterActive
 		{
 			get { return alterActive; }
-			internal set { alterActive = value; }
 		}
 
 		public bool StockToolbar
 		{
 			get { return stockToolbar; }
-			internal set { stockToolbar = value; }
 		}
 
 		public bool WarnedZero
 		{
 			get { return warnedZero; }
-			internal set { warnedZero = value; }
 		}
 
 		public bool WarnedAlterActive
 		{
 			get { return warnedAlterActive; }
-			internal set { warnedAlterActive = value; }
 		}
 
 		public bool WarnedToolbar
 		{
 			get { return warnedToolbar; }
-			internal set { warnedToolbar = value; }
 		}
 	}
 }

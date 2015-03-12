@@ -82,7 +82,7 @@ namespace ContractModifier
 			stockToolbar = contractModifierScenario.Instance.stockToolbar;
 			alterActive = contractModifierScenario.Instance.alterActive;
 			allowZero = contractModifierScenario.Instance.allowZero;
-			showToolbar = contractModifierScenario.Instance.CMNode.ShowToolbar;
+			showToolbar = contractModifierScenario.Instance.showToolbar;
 		}
 
 		protected override void OnDestroy()
@@ -220,7 +220,7 @@ namespace ContractModifier
 				}
 			}
 
-			if (!contractModifierScenario.Instance.CMNode.WarnedZero)
+			if (!contractModifierScenario.Instance.warnedZero)
 			{
 				if (allowZero != contractModifierScenario.Instance.allowZero)
 				{
@@ -233,7 +233,7 @@ namespace ContractModifier
 				}
 			}
 
-			if (!contractModifierScenario.Instance.CMNode.WarnedAlterActive)
+			if (!contractModifierScenario.Instance.warnedAlterActive)
 			{
 				if (alterActive != contractModifierScenario.Instance.alterActive)
 				{
@@ -246,13 +246,13 @@ namespace ContractModifier
 				}
 			}
 
-			if (!contractModifierScenario.Instance.CMNode.WarnedToolbar)
+			if (!contractModifierScenario.Instance.warnedToolbar)
 			{
 				if (showToolbar != contractModifierScenario.Instance.CMNode.ShowToolbar)
 				{
 					if (showToolbar)
 					{
-						contractModifierScenario.Instance.CMNode.ShowToolbar = true;
+						contractModifierScenario.Instance.showToolbar = true;
 						dropDown = true;
 						toolbarPopup = true;
 					}
@@ -705,7 +705,7 @@ namespace ContractModifier
 					if (ToolbarManager.ToolbarAvailable)
 						contractModifierScenario.Instance.stockToolbar = GUILayout.Toggle(contractModifierScenario.Instance.stockToolbar, "Use Stock Toolbar", cmSkins.configToggle);
 
-					contractModifierScenario.Instance.CMNode.ShowToolbar = GUILayout.Toggle(!contractModifierScenario.Instance.CMNode.ShowToolbar, "Disable All Toolbars", cmSkins.configToggle);
+					contractModifierScenario.Instance.showToolbar = GUILayout.Toggle(!contractModifierScenario.Instance.showToolbar, "Disable All Toolbars", cmSkins.configToggle);
 				GUILayout.EndVertical();
 
 				GUILayout.Space(20);
@@ -800,7 +800,7 @@ namespace ContractModifier
 					r.x += 20;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.CMNode.WarnedZero = GUI.Toggle(r, contractModifierScenario.Instance.CMNode.WarnedZero, "Do not show this warning", cmSkins.configToggle);
+					contractModifierScenario.Instance.warnedZero = GUI.Toggle(r, contractModifierScenario.Instance.warnedZero, "Do not show this warning", cmSkins.configToggle);
 
 					r.x += 65;
 					r.y += 30;
@@ -878,7 +878,7 @@ namespace ContractModifier
 					r.x += 20;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.CMNode.WarnedAlterActive = GUI.Toggle(r, contractModifierScenario.Instance.CMNode.WarnedAlterActive, "Do not show this warning", cmSkins.configToggle);
+					contractModifierScenario.Instance.warnedAlterActive = GUI.Toggle(r, contractModifierScenario.Instance.warnedAlterActive, "Do not show this warning", cmSkins.configToggle);
 
 					r.x += 100;
 					r.y += 30;
@@ -902,7 +902,7 @@ namespace ContractModifier
 					r.x += 20;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.CMNode.WarnedToolbar = GUI.Toggle(r, contractModifierScenario.Instance.CMNode.WarnedToolbar, "Do not show this warning", cmSkins.configToggle);
+					contractModifierScenario.Instance.warnedToolbar = GUI.Toggle(r, contractModifierScenario.Instance.warnedToolbar, "Do not show this warning", cmSkins.configToggle);
 
 					r.x += 100;
 					r.y += 30;
@@ -911,7 +911,7 @@ namespace ContractModifier
 					{
 						dropDown = false;
 						toolbarPopup = false;
-						contractModifierScenario.Instance.CMNode.ShowToolbar = false;
+						contractModifierScenario.Instance.showToolbar = false;
 						showToolbar = false;
 					}
 				}

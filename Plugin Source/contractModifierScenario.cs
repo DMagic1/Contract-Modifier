@@ -67,9 +67,13 @@ namespace ContractModifier
 		[KSPField(isPersistant = true)]
 		public string version = "1.0";
 
-		public bool allowZero;
-		public bool alterActive;
-		public bool stockToolbar;
+		public bool allowZero = false;
+		public bool alterActive = false;
+		public bool stockToolbar = true;
+		public bool showToolbar = true;
+		public bool warnedZero = false;
+		public bool warnedToolbar = false;
+		public bool warnedAlterActive = false;
 
 		internal cmStockToolbar appLauncherButton;
 		internal cmToolbar blizzyToolbarButton;
@@ -120,10 +124,18 @@ namespace ContractModifier
 			allowZero = cmNode.AllowZero;
 			alterActive = cmNode.AlterActive;
 			stockToolbar = cmNode.StockToolbar;
+			showToolbar = cmNode.ShowToolbar;
+			warnedAlterActive = cmNode.WarnedAlterActive;
+			warnedToolbar = cmNode.WarnedToolbar;
+			warnedZero = cmNode.WarnedZero;
 
 			bool.TryParse(node.GetValue("allowZero"), out allowZero);
 			bool.TryParse(node.GetValue("alterActive"), out alterActive);
 			bool.TryParse(node.GetValue("stockToolbar"), out stockToolbar);
+			bool.TryParse(node.GetValue("showToolbar"), out showToolbar);
+			bool.TryParse(node.GetValue("warnedAlterActive"), out warnedAlterActive);
+			bool.TryParse(node.GetValue("warnedToolbar"), out warnedToolbar);
+			bool.TryParse(node.GetValue("warnedZero"), out warnedZero);
 
 			try
 			{
@@ -191,6 +203,10 @@ namespace ContractModifier
 			node.AddValue("allowZero", allowZero);
 			node.AddValue("alterActive", alterActive);
 			node.AddValue("stockToolbar", stockToolbar);
+			node.AddValue("showToolbar", showToolbar);
+			node.AddValue("warnedAlterActive", warnedAlterActive);
+			node.AddValue("warnedToolbar", warnedToolbar);
+			node.AddValue("warnedZero", warnedZero);
 
 			try
 			{
