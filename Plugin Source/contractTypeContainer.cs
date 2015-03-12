@@ -59,6 +59,8 @@ namespace ContractModifier
 		private float maxOffer = 10;
 		[Persistent]
 		private float maxActive = 10;
+		[Persistent]
+		private bool contractConfiguratorType = false;
 
 		private float defaultFundReward = 1.0f;
 		private float defaultFundAdvance = 1.0f;
@@ -93,27 +95,27 @@ namespace ContractModifier
 
 			contractTypeContainer global = cmConfigLoad.TopNode.getCType("GlobalSettings");
 			if (global != null)
-			{
-				this.defaultFundReward = this.fundReward = global.fundReward;
-				this.defaultFundAdvance = this.fundAdvance = global.fundAdvance;
-				this.defaultFundPenalty = this.fundPenalty = global.fundPenalty;
-				this.defaultRepReward = this.repReward = global.repReward;
-				this.defaultRepPenalty = this.repPenalty = global.repPenalty;
-				this.defaultScienceReward = this.scienceReward = global.scienceReward;
-				this.defaultDuration = this.durationTime = global.durationTime;
-				this.defaultMaxOffer = this.maxOffer = global.maxOffer;
-				this.defaultMaxActive = this.maxActive = global.maxActive;
-			}
+				setValuesToGlobal(global);
 		}
 
-		internal contractTypeContainer (string n)
+		internal contractTypeContainer (string n, bool cconfig)
 		{
 			typeName = n;
 			name = displayName(n);
-			maxOffer /= 10f;
-			maxActive /= 10f;
 			if (typeName == "GlobalSettings")
 				generic = true;
+			else
+			{
+				contractConfiguratorType = cconfig;
+				if (!contractConfiguratorType)
+					contractType = ContractValuesNode.getContractType(typeName);
+				else
+					contractType = ContractValuesNode.getContractType("ConfiguredContract");
+
+				contractTypeContainer global = cmConfigLoad.TopNode.getCType("GlobalSettings");
+				if (global != null)
+					setValuesToGlobal(global);
+			}
 		}
 
 		public contractTypeContainer()
@@ -123,25 +125,47 @@ namespace ContractModifier
 
 		public override void OnDecodeFromConfigNode()
 		{
-			loadFromNode(true);
+			loadFromNode();
 		}
 
-		internal bool loadFromNode(bool zero)
+		internal bool loadFromNode()
 		{
 			name = displayName(typeName);
-			defaultFundReward = fundReward = fundReward.returnNonZero(zero);
-			defaultFundAdvance = fundAdvance = fundAdvance.returnNonZero(zero);
-			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero(zero);
-			defaultRepReward = repReward = repReward.returnNonZero(zero);
-			defaultRepPenalty = repPenalty = repPenalty.returnNonZero(zero);
-			defaultScienceReward = scienceReward = scienceReward.returnNonZero(zero);
-			defaultDuration = durationTime = durationTime.returnNonZero(zero);
-			defaultMaxOffer = maxOffer = (maxOffer / 10f).returnNonZero(zero);
-			defaultMaxActive = maxActive = (maxActive / 10f).returnNonZero(zero);
+			defaultFundReward = fundReward = fundReward.returnNonZero();
+			defaultFundAdvance = fundAdvance = fundAdvance.returnNonZero();
+			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero();
+			defaultRepReward = repReward = repReward.returnNonZero();
+			defaultRepPenalty = repPenalty = repPenalty.returnNonZero();
+			defaultScienceReward = scienceReward = scienceReward.returnNonZero();
+			defaultDuration = durationTime = durationTime.returnNonZero();
+			MaxOffer = (maxOffer / 10f);
+			defaultMaxOffer = maxOffer;
+			MaxActive = (maxActive / 10f);
+			defaultMaxActive = maxActive;
 
 			if (typeName == "GlobalSettings")
 				generic = true;
+			else
+			{
+				if (!contractConfiguratorType)
+					contractType = ContractValuesNode.getContractType(typeName);
+				else
+					contractType = ContractValuesNode.getContractType("ConfiguredContract");
+			}
 			return true;
+		}
+
+		private void setValuesToGlobal(contractTypeContainer global)
+		{
+			this.defaultFundReward = this.fundReward = global.fundReward;
+			this.defaultFundAdvance = this.fundAdvance = global.fundAdvance;
+			this.defaultFundPenalty = this.fundPenalty = global.fundPenalty;
+			this.defaultRepReward = this.repReward = global.repReward;
+			this.defaultRepPenalty = this.repPenalty = global.repPenalty;
+			this.defaultScienceReward = this.scienceReward = global.scienceReward;
+			this.defaultDuration = this.durationTime = global.durationTime;
+			this.defaultMaxOffer = this.maxOffer = global.maxOffer;
+			this.defaultMaxActive = this.maxActive = global.maxActive;
 		}
 
 		private string displayName (string s)
@@ -162,6 +186,11 @@ namespace ContractModifier
 		public bool Generic
 		{
 			get { return generic; }
+		}
+
+		public bool CConfigType
+		{
+			get { return contractConfiguratorType; }
 		}
 
 		public string Name
@@ -312,8 +341,18 @@ namespace ContractModifier
 			get { return maxOffer; }
 			set
 			{
-				if (value >= 0 && value <= 10)
-					maxOffer = value;
+				if (!contractConfiguratorType)
+				{
+					if (value >= 0 && value <= 10)
+						maxOffer = value;
+				}
+				else
+				{
+					if (value >= 0.1f && value <= 10)
+						maxOffer = value;
+					else if (value >= 0)
+						maxOffer = 0.1f;
+				}
 			}
 		}
 
@@ -322,8 +361,18 @@ namespace ContractModifier
 			get { return maxActive; }
 			set
 			{
-				if (value >= 0 && value <= 10)
-					maxActive = value;
+				if (!contractConfiguratorType)
+				{
+					if (value >= 0 && value <= 10)
+						maxActive = value;
+				}
+				else
+				{
+					if (value >= 0.1f && value <= 10)
+						maxActive = value;
+					else if (value >= 0)
+						maxActive = 0.1f;
+				}
 			}
 		}
 

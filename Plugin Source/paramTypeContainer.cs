@@ -50,6 +50,8 @@ namespace ContractModifier
 		private float repPenalty = 1.0f;
 		[Persistent]
 		private float scienceReward = 1.0f;
+		[Persistent]
+		private bool contractConfiguratorType = false;
 
 		private float defaultFundReward = 1.0f;
 		private float defaultFundPenalty = 1.0f;
@@ -80,12 +82,13 @@ namespace ContractModifier
 
 			paramTypeContainer global = cmConfigLoad.TopNode.getPType("GlobalSettings");
 			if (global != null)
+				setValuesToGlobal(global);
+
+			Type t = ContractValuesNode.getParameterType("ContractConfiguratorParameter");
+			if (t != null)
 			{
-				this.defaultFundReward = this.fundReward = global.fundReward;
-				this.defaultFundPenalty = this.fundPenalty = global.fundPenalty;
-				this.defaultRepReward = this.repReward = global.repReward;
-				this.defaultRepPenalty = this.repPenalty = global.repPenalty;
-				this.defaultScienceReward = this.scienceReward = global.scienceReward;
+				if (PType.IsSubclassOf(t))
+					contractConfiguratorType = true;
 			}
 		}
 
@@ -95,6 +98,15 @@ namespace ContractModifier
 			name = displayName(n);
 			if (typeName == "GlobalSettings")
 				generic = true;
+			else
+			{
+
+				paramType = ContractValuesNode.getParameterType(typeName);
+
+				paramTypeContainer global = cmConfigLoad.TopNode.getPType("GlobalSettings");
+				if (global != null)
+					setValuesToGlobal(global);
+			}
 		}
 
 		public paramTypeContainer()
@@ -104,21 +116,32 @@ namespace ContractModifier
 
 		public override void OnDecodeFromConfigNode()
 		{
-			loadFromNode(true);
+			loadFromNode();
 		}
 
-		internal bool loadFromNode(bool zero)
+		internal bool loadFromNode()
 		{
 			name = displayName(typeName);
-			defaultFundReward = fundReward = fundReward.returnNonZero(zero);
-			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero(zero);
-			defaultRepReward = repReward = repReward.returnNonZero(zero);
-			defaultRepPenalty = repPenalty = repPenalty.returnNonZero(zero);
-			defaultScienceReward = scienceReward = scienceReward.returnNonZero(zero);
+			defaultFundReward = fundReward = fundReward.returnNonZero();
+			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero();
+			defaultRepReward = repReward = repReward.returnNonZero();
+			defaultRepPenalty = repPenalty = repPenalty.returnNonZero();
+			defaultScienceReward = scienceReward = scienceReward.returnNonZero();
 
 			if (typeName == "GlobalSettings")
 				generic = true;
+			else
+				paramType = ContractValuesNode.getParameterType(typeName);
 			return true;
+		}
+
+		private void setValuesToGlobal(paramTypeContainer global)
+		{
+			this.defaultFundReward = this.fundReward = global.fundReward;
+			this.defaultFundPenalty = this.fundPenalty = global.fundPenalty;
+			this.defaultRepReward = this.repReward = global.repReward;
+			this.defaultRepPenalty = this.repPenalty = global.repPenalty;
+			this.defaultScienceReward = this.scienceReward = global.scienceReward;
 		}
 
 		private string displayName(string s)
@@ -134,6 +157,11 @@ namespace ContractModifier
 		public bool Generic
 		{
 			get { return generic; }
+		}
+
+		public bool CConfigType
+		{
+			get { return contractConfiguratorType; }
 		}
 
 		public Type ParamType
