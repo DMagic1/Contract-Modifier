@@ -30,6 +30,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Contracts;
+using Contracts.Parameters;
 using ContractModifier.Framework;
 
 namespace ContractModifier
@@ -57,6 +59,9 @@ namespace ContractModifier
 
 		private Dictionary<string, contractTypeContainer> masterContractList = new Dictionary<string, contractTypeContainer>();
 		private Dictionary<string, paramTypeContainer> masterParamList = new Dictionary<string, paramTypeContainer>();
+
+		private static Dictionary<string, Type> contractTypes = new Dictionary<string, Type>();
+		private static Dictionary<string, Type> parameterTypes = new Dictionary<string, Type>();
 
 		public override void OnDecodeFromConfigNode()
 		{
@@ -106,10 +111,19 @@ namespace ContractModifier
 		{
 			FilePath = filePath;
 
+			loadCurrentContractTypes();
+			loadCurrentParameterTypes();
+
 			if (Load())
 				topNode = this.AsConfigNode;
 			else
 				topNode = new ConfigNode("ContractValuesNode");
+
+			if (cmAssemblyLoad.ContractConfiguratorLoaded)
+				loadCConfigTypes();
+
+			checkAllContractTypes();
+			checkAllParamTypes();
 		}
 
 		private ConfigNode topNode;
@@ -186,6 +200,126 @@ namespace ContractModifier
 			{
 				LogFormatted("Parameter Type Container Dictionary Already Has Parameter Of This Type; Skipping...");
 				return false;
+			}
+		}
+
+		private void loadCurrentContractTypes()
+		{
+			try
+			{
+				foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
+				{
+					Type[] assemblyTypes = assembly.assembly.GetTypes();
+					foreach (Type t in assemblyTypes)
+					{
+						if (t.IsSubclassOf(typeof(Contract)))
+						{
+							if (t != typeof(Contract))
+							{
+								if (!contractTypes.ContainsKey(t.Name))
+									contractTypes.Add(t.Name, t);
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error loading contract types: {0}", e);
+			}
+		}
+
+		private void checkAllContractTypes()
+		{
+			foreach (Type t in contractTypes.Values)
+			{
+				if (t.Name == "ConfiguredContract")
+					continue;
+				if (getCType(t.Name) == null)
+				{
+					if (!addToContractList(new contractTypeContainer(t)))
+						DMCM_MBE.LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", t.Name);
+				}
+			}
+		}
+
+		private void loadCurrentParameterTypes()
+		{
+			try
+			{
+				foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
+				{
+					Type[] assemblyTypes = assembly.assembly.GetTypes();
+					foreach (Type t in assemblyTypes)
+					{
+						if (t.IsSubclassOf(typeof(ContractParameter)))
+						{
+							if (t != typeof(ContractParameter))
+							{
+								if (!parameterTypes.ContainsKey(t.Name))
+									parameterTypes.Add(t.Name, t);
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error loading parameter types: {0}", e);
+			}
+		}
+
+		private void checkAllParamTypes()
+		{
+			foreach(Type t in parameterTypes.Values)
+			{
+				if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart" || t.Name == "AlwaysTrue")
+					continue;
+				if (t.IsAbstract)
+					continue;
+				if (t.IsGenericType)
+					continue;
+				if (t.IsSealed)
+					continue;
+				if (getPType(t.Name) == null)
+				{
+					if (!addToParamList(new paramTypeContainer(t)))
+						DMCM_MBE.LogFormatted("Error During Parameter Type Loading; [{0}] Cannot Be Added To Parameter Type List", t.Name);
+				}
+			}
+		}
+
+		private void loadCConfigTypes()
+		{
+			foreach (string s in cmAssemblyLoad.ContractConfiguratorTypeNames)
+			{
+				if (getCType(s) == null)
+				{
+					if (!addToContractList(new contractTypeContainer(s, true)))
+						DMCM_MBE.LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", s);
+				}
+			}
+		}
+
+		public static Type getContractType(string name)
+		{
+			if (contractTypes.ContainsKey(name))
+				return contractTypes[name];
+			else
+			{
+				LogFormatted("Cannot find Contract Type of name: {0}", name);
+				return null;
+			}
+		}
+
+		public static Type getParameterType(string name)
+		{
+			if (parameterTypes.ContainsKey(name))
+				return parameterTypes[name];
+			else
+			{
+				LogFormatted("Cannot find Parameter Type of name: {0}", name);
+				return null;
 			}
 		}
 
