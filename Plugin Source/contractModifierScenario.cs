@@ -180,7 +180,7 @@ namespace ContractModifier
 			}
 
 			if (cmNode.getCType("GlobalSettings") == null)
-				cmNode.addToContractList(new contractTypeContainer("GlobalSettings"));
+				cmNode.addToContractList(new contractTypeContainer("GlobalSettings", false));
 
 			if (cmNode.getPType("GlobalSettings") == null)
 				cmNode.addToParamList(new paramTypeContainer("GlobalSettings"));
@@ -337,6 +337,9 @@ namespace ContractModifier
 			if (cC == null)
 				return;
 
+			if (cC.ContractType == null)
+				return;
+
 			if (cC.MaxActive < 10f || cC.MaxOffer < 10f)
 			{
 				var cList = ContractSystem.Instance.Contracts;
@@ -378,6 +381,9 @@ namespace ContractModifier
 
 		private void paramChanged(float[] originals, paramTypeContainer p)
 		{
+			if (p.ParamType == null)
+				return;
+
 			var cList = ContractSystem.Instance.Contracts;
 			for (int i = 0; i < cList.Count; i++)
 			{
@@ -392,6 +398,9 @@ namespace ContractModifier
 
 		private void contractChanged(float[] originals, contractTypeContainer c)
 		{
+			if (c.ContractType == null)
+				return;
+
 			var cList = ContractSystem.Instance.Contracts;
 			for (int i = 0; i < cList.Count; i++)
 			{
@@ -472,6 +481,7 @@ namespace ContractModifier
 		{
 			pList = new List<paramTypeContainer>();
 			List<paramTypeContainer> sortList = new List<paramTypeContainer>();
+			List<paramTypeContainer> pConfiguratorList = new List<paramTypeContainer>();
 			for (int i = 0; i < cmNode.ParameterTypeCount; i++)
 			{
 				paramTypeContainer p = cmNode.getPType(i);
@@ -479,6 +489,8 @@ namespace ContractModifier
 				{
 					if (p.Generic && pList.Count == 0)
 						pList.Add(p);
+					else if (p.CConfigType)
+						pConfiguratorList.Add(p);
 					else
 						sortList.Add(p);
 				}
@@ -490,6 +502,12 @@ namespace ContractModifier
 				pList.AddRange(sortList);
 			}
 
+			if (pConfiguratorList.Count > 0)
+			{
+				pConfiguratorList.Sort((a, b) => string.Compare(a.Name, b.Name));
+				pList.AddRange(pConfiguratorList);
+			}
+
 			return pList;
 		}
 
@@ -497,6 +515,7 @@ namespace ContractModifier
 		{
 			cList = new List<contractTypeContainer>();
 			List<contractTypeContainer> sortList = new List<contractTypeContainer>();
+			List<contractTypeContainer> cConfiguratorList = new List<contractTypeContainer>();
 			for (int i = 0; i < cmNode.ContractTypeCount; i++)
 			{
 				contractTypeContainer c = cmNode.getCType(i);
@@ -504,6 +523,8 @@ namespace ContractModifier
 				{
 					if (c.Generic && cList.Count == 0)
 						cList.Add(c);
+					else if (c.CConfigType)
+						cConfiguratorList.Add(c);
 					else
 						sortList.Add(c);
 				}
@@ -513,6 +534,12 @@ namespace ContractModifier
 			{
 				sortList.Sort((a, b) => string.Compare(a.Name, b.Name));
 				cList.AddRange(sortList);
+			}
+
+			if (cConfiguratorList.Count > 0)
+			{
+				cConfiguratorList.Sort((a, b) => string.Compare(a.Name, b.Name));
+				cList.AddRange(cConfiguratorList);
 			}
 
 			return cList;
