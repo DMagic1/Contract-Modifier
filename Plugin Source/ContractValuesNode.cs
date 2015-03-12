@@ -57,8 +57,8 @@ namespace ContractModifier
 		[Persistent]
 		private List<paramTypeContainer> ParameterTypeConfigs = new List<paramTypeContainer>();
 
-		private Dictionary<string, contractTypeContainer> masterContractList = new Dictionary<string, contractTypeContainer>();
-		private Dictionary<string, paramTypeContainer> masterParamList = new Dictionary<string, paramTypeContainer>();
+		private static Dictionary<string, contractTypeContainer> masterContractList = new Dictionary<string, contractTypeContainer>();
+		private static Dictionary<string, paramTypeContainer> masterParamList = new Dictionary<string, paramTypeContainer>();
 
 		private static Dictionary<string, Type> contractTypes = new Dictionary<string, Type>();
 		private static Dictionary<string, Type> parameterTypes = new Dictionary<string, Type>();
@@ -144,22 +144,22 @@ namespace ContractModifier
 			get { return topNode; }
 		}
 
-		public int ContractTypeCount
+		public static int ContractTypeCount
 		{
 			get { return masterContractList.Count; }
 		}
 
-		public int ParameterTypeCount
+		public static int ParameterTypeCount
 		{
 			get { return masterParamList.Count; }
 		}
 
-		public contractTypeContainer getCType(int i)
+		public static contractTypeContainer getCType(int i)
 		{
 			return masterContractList.ElementAtOrDefault(i).Value;
 		}
 
-		public contractTypeContainer getCType(string s)
+		public static contractTypeContainer getCType(string s)
 		{
 			if (masterContractList.ContainsKey(s))
 				return masterContractList[s];
@@ -170,12 +170,12 @@ namespace ContractModifier
 			}
 		}
 
-		public paramTypeContainer getPType(int i)
+		public static paramTypeContainer getPType(int i)
 		{
 			return masterParamList.ElementAtOrDefault(i).Value;
 		}
 
-		public paramTypeContainer getPType(string s)
+		public static paramTypeContainer getPType(string s)
 		{
 			if (masterParamList.ContainsKey(s))
 				return masterParamList[s];
