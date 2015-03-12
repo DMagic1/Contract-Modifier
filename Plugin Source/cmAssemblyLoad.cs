@@ -60,19 +60,17 @@ namespace ContractModifier
 		private const string contractsPlusContractMethodName = "UpdateContractType";
 		private const string contractsPlusParameterMethodName = "UpdateParameterType";
 		private const string contractConfiguratorTypeName = "ContractConfigurator.ContractType";
-		private const string contractConfiguratorTypeMethod = "AllValidContractTypes";
+		private const string contractConfiguratorTypeMethod = "AllValidContractTypeNames";
 
 		private delegate void ContractPlusUpdateContract(Type t);
 		private delegate void ContractPlusUpdateParameter(Type t);
-		private delegate void ContractConfiguratorTypes();
 
 		private static ContractPlusUpdateContract _UpdateContract;
 		private static ContractPlusUpdateParameter _UpdateParam;
-		private static ContractConfiguratorTypes _CCTypes;
+
+		internal static IEnumerable<string> ContractConfiguratorTypeNames = null;
 
 		private static Type CPlusType;
-
-		private static Type CConfigType;
 
 		internal static void loadReflectionMethods()
 		{
@@ -166,12 +164,9 @@ namespace ContractModifier
 
 		private static bool checkForContractConfigurator()
 		{
-			if (_CCTypes != null)
-				return true;
-
 			try
 			{
-				CConfigType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
+				Type CConfigType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
 						.SingleOrDefault(t => t.FullName == contractConfiguratorTypeName);
 
 				if (CConfigType == null)
@@ -184,35 +179,17 @@ namespace ContractModifier
 
 				if (CConfigTypeProperty == null)
 				{
-					DMCM_MBE.LogFormatted("Contract Configurator Method Not Loaded");
+					DMCM_MBE.LogFormatted("Contract Configurator Property Not Loaded");
 					return false;
 				}
 
-				FieldInfo ccTypeName = CConfigType.GetField("name");
+				var names = CConfigTypeProperty.GetValue(null, null);
 
-				CConfigType.InvokeMember(contractConfiguratorTypeMethod, BindingFlags.Static | BindingFlags.GetProperty | BindingFlags.Public, null, null, null);
+				IEnumerable<string> enumerableNames = (IEnumerable<string>)names;
 
-				int counter = 0;
+				ContractConfiguratorTypeNames = enumerableNames;
 
-				while (true)
-				{
-					try
-					{
-						CConfigTypeProperty.GetValue(null, new object[] { counter });
-						counter++;
-					}
-					catch
-					{
-						break;
-					}
-				}
-				for (int i = 0; i < counter; i++)
-				{
-					var ccType = CConfigTypeProperty.GetValue(null, new object[] { i });
-					var ccName = ccTypeName.GetValue(ccType);
-
-					string name = (string)ccName;
-				}
+				return ContractConfiguratorTypeNames != null;
 			}
 			catch (Exception e)
 			{
