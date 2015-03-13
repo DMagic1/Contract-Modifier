@@ -77,6 +77,7 @@ namespace ContractModifier
 			newWindowStyle = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.window);
 			newWindowStyle.name = "WindowStyle";
 			newWindowStyle.fontSize = 14;
+			newWindowStyle.fontStyle = FontStyle.Bold;
 			newWindowStyle.padding = new RectOffset(0, 1, 20, 12);
 			newWindowStyle.normal.background = windowTex;
 			newWindowStyle.focused.background = newWindowStyle.normal.background;
@@ -105,7 +106,8 @@ namespace ContractModifier
 
 			configDropMenu = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.label);
 			configDropMenu.name = "ConfigDropMenu";
-			configDropMenu.fontSize = 12;
+			configDropMenu.fontSize = 13;
+			configDropMenu.fontStyle = FontStyle.Bold;
 			configDropMenu.padding = new RectOffset(2, 2, 2, 2);
 			configDropMenu.normal.textColor = XKCDColors.White;
 			configDropMenu.hover.textColor = XKCDColors.AlmostBlack;
@@ -121,12 +123,14 @@ namespace ContractModifier
 			configDropDown.fontSize = 16;
 			configDropDown.normal.textColor = XKCDColors.DustyOrange;
 			configDropDown.alignment = TextAnchor.MiddleCenter;
+			configDropDown.fontStyle = FontStyle.Bold;
 
 			configHeader = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.label);
 			configHeader.name = "ConfigHeader";
 			configHeader.fontSize = 16;
 			configHeader.normal.textColor = XKCDColors.DustyOrange;
 			configHeader.alignment = TextAnchor.MiddleLeft;
+			configHeader.fontStyle = FontStyle.Bold;
 
 			configClose = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.button);
 			configClose.name = "ConfigClose";
@@ -138,23 +142,33 @@ namespace ContractModifier
 			configLabel = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.label);
 			configLabel.name = "ConfigLabel";
 			configLabel.alignment = TextAnchor.MiddleRight;
-			configLabel.fontSize = 12;
+			configLabel.fontSize = 13;
 
 			configButton = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.button);
 			configButton.name = "ConfigButton";
-			configButton.fontSize = 12;
+			configButton.fontSize = 13;
+			configButton.fontStyle = FontStyle.Bold;
 
 			configToggle = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.toggle);
 			configToggle.name = "ConfigToggle";
-			configToggle.fontSize = 12;
+			configToggle.fontSize = 13;
+			configToggle.fontStyle = FontStyle.Bold;
 
 			configCenterLabel = new GUIStyle(configLabel);
 			configCenterLabel.name = "ConfigCenterLabel";
 			configCenterLabel.alignment = TextAnchor.MiddleCenter;
 
 			DMCM_SkinsLibrary.List["CMUnitySkin"].window = new GUIStyle(newWindowStyle);
+			DMCM_SkinsLibrary.List["CMUnitySkin"].button = new GUIStyle(configButton);
+			DMCM_SkinsLibrary.List["CMUnitySkin"].label = new GUIStyle(configLabel);
+			DMCM_SkinsLibrary.List["CMUnitySkin"].toggle = new GUIStyle(configToggle);
+			DMCM_SkinsLibrary.List["CMUnitySkin"].box = new GUIStyle(dropDown);
 
 			DMCM_SkinsLibrary.AddStyle("CMUnitySkin", newWindowStyle);
+			DMCM_SkinsLibrary.AddStyle("CMUnitySkin", configButton);
+			DMCM_SkinsLibrary.AddStyle("CMUnitySkin", configLabel);
+			DMCM_SkinsLibrary.AddStyle("CMUnitySkin", configToggle);
+			DMCM_SkinsLibrary.AddStyle("CMUnitySkin", dropDown);
 		}
 
 	}
