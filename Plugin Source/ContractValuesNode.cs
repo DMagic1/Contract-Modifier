@@ -31,7 +31,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Contracts;
-using Contracts.Parameters;
 using ContractModifier.Framework;
 
 namespace ContractModifier
@@ -88,6 +87,7 @@ namespace ContractModifier
 
 		public override void OnEncodeToConfigNode()
 		{
+			LogFormatted_DebugOnly("Encoding top node");
 			try
 			{
 				ContractTypeConfigs = masterContractList.Values.ToList();
@@ -125,23 +125,13 @@ namespace ContractModifier
 			loadCurrentContractTypes();
 			loadCurrentParameterTypes();
 
-			if (Load())
-				topNode = this.AsConfigNode;
-			else
-				topNode = new ConfigNode("ContractValuesNode");
+			Load();
 
 			if (cmAssemblyLoad.ContractConfiguratorLoaded)
 				loadCConfigTypes();
 
 			checkAllContractTypes();
 			checkAllParamTypes();
-		}
-
-		private ConfigNode topNode;
-
-		public ConfigNode TopNode
-		{
-			get { return topNode; }
 		}
 
 		public static int ContractTypeCount
