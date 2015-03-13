@@ -29,6 +29,7 @@ THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using Contracts;
 using Contracts.Parameters;
@@ -45,6 +46,7 @@ namespace ContractModifier
 		private bool spacecenterLocked, trackingLocked, editorLocked;
 		private bool stockToolbar = true;
 		private bool alterActive, allowZero, showToolbar;
+		private string version;
 		private Rect ddRect;
 		private Vector2 cScroll, pScroll;
 		private List<contractTypeContainer> cList;
@@ -57,12 +59,22 @@ namespace ContractModifier
 
 		protected override void Awake()
 		{
+			Assembly assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
+			var ainfoV = Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
+			switch (ainfoV == null)
+			{
+				case true: version = ""; break;
+				default: version = ainfoV.InformationalVersion; break;
+			}
+
 			WindowCaption = "Contract Configuration";
-			WindowRect = new Rect(40, 80, 780, 380);
+			WindowRect = new Rect(40, 80, 840, 380);
 			WindowStyle = cmSkins.newWindowStyle;
 			Visible = false;
 			DragEnabled = true;
 			TooltipMouseOffset = new Vector2d(-10, -25);
+
+			ClampToScreenOffset = new RectOffset(-400, -400, -200, -200);
 
 			//Make sure our click-through control locks are disabled
 			InputLockManager.RemoveControlLock(lockID);
@@ -174,16 +186,17 @@ namespace ContractModifier
 		protected override void DrawWindow(int id)
 		{
 			closeButton(id);						/* Draw the close button */
+			versionLabel(id);						/* Draw the version label */
 
 			GUILayout.BeginVertical();
-				GUILayout.Space(10);
+				GUILayout.Space(20);
 				GUILayout.BeginHorizontal();
 					GUILayout.Space(8);
 					GUILayout.BeginVertical();
 						contractSelectionMenu(id);	/* Drop down menu and label for the current contract type */
 						contractOptions(id);		/* Contract reward/penalty sliders */
 					GUILayout.EndVertical();
-					GUILayout.Space(50);
+					GUILayout.Space(70);
 					GUILayout.BeginVertical();
 						parameterSelectionMenu(id);	/* Drop down menu and label for the current parameter */
 						parameterOptions(id);		/* Parameter reward/penalty sliders */
@@ -277,6 +290,13 @@ namespace ContractModifier
 			}
 		}
 
+		//Draw the version number label
+		private void versionLabel(int id)
+		{
+			Rect r = new Rect(2, 2, 30, 20);
+			GUI.Label(r, version);
+		}
+
 		//Contract type selector
 		private void contractSelectionMenu(int id)
 		{
@@ -289,31 +309,40 @@ namespace ContractModifier
 				}
 
 				if (contractType != null)
-					GUILayout.Label(contractType.Name, cmSkins.configHeader, GUILayout.MaxWidth(160));
+					GUILayout.Label(contractType.Name, cmSkins.configHeader, GUILayout.Width(260));
 				else
-					GUILayout.Label("Unknown", cmSkins.configHeader, GUILayout.MaxWidth(160));
+					GUILayout.Label("Unknown", cmSkins.configHeader, GUILayout.Width(260));
 				GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 
 			if (contractType.Generic)
 			{
-				GUILayout.Space(-4);
-				if (GUILayout.Button("Apply To All Contracts", cmSkins.configButton))
-				{
-					foreach (contractTypeContainer c in cList)
+				GUILayout.BeginHorizontal();
+					GUILayout.Space(180);
+					if (!dropDown)
 					{
-						c.RewardFund = contractType.RewardFund;
-						c.AdvanceFund = contractType.AdvanceFund;
-						c.PenaltyFund = contractType.PenaltyFund;
-						c.RewardRep = contractType.RewardRep;
-						c.PenaltyRep = contractType.PenaltyRep;
-						c.RewardScience = contractType.RewardScience;
-						c.DurationTime = contractType.DurationTime;
-						c.MaxOffer = contractType.MaxOffer;
-						c.MaxActive = contractType.MaxActive;
+						if (GUILayout.Button("Apply To All Contracts", GUILayout.MaxWidth(220)))
+						{
+							foreach (contractTypeContainer c in cList)
+							{
+								c.RewardFund = contractType.RewardFund;
+								c.AdvanceFund = contractType.AdvanceFund;
+								c.PenaltyFund = contractType.PenaltyFund;
+								c.RewardRep = contractType.RewardRep;
+								c.PenaltyRep = contractType.PenaltyRep;
+								c.RewardScience = contractType.RewardScience;
+								c.DurationTime = contractType.DurationTime;
+								c.MaxOffer = contractType.MaxOffer;
+								c.MaxActive = contractType.MaxActive;
+							}
+						}
 					}
-				}
+					else
+						GUILayout.Label("Apply To All Contracts", cmSkins.configButton, GUILayout.MaxWidth(220));
+				GUILayout.EndHorizontal();
 			}
+			else
+				GUILayout.Space(25);
 		}
 
 		//Contract options
@@ -321,7 +350,7 @@ namespace ContractModifier
 		{
 			GUILayout.Space(12);
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Funds Reward: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Funds Reward: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				string percent = "";
 				if (!contractModifierScenario.Instance.allowZero && contractType.RewardFund <= 0.009)
@@ -346,7 +375,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Funds Advance: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Funds Advance: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && contractType.AdvanceFund <= 0.009)
 					percent = "0.1%";
@@ -370,7 +399,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Funds Penalty: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Funds Penalty: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && contractType.PenaltyFund <= 0.009)
 					percent = "0.1%";
@@ -394,7 +423,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Rep Reward: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Rep Reward: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && contractType.RewardRep <= 0.009)
 					percent = "0.1%";
@@ -418,7 +447,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Rep Penalty: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Rep Penalty: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && contractType.PenaltyRep <= 0.009)
 					percent = "0.1%";
@@ -442,7 +471,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Science Reward: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Science Reward: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && contractType.RewardScience <= 0.009)
 					percent = "0.1%";
@@ -466,7 +495,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Duration: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Duration: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				GUILayout.Label(contractType.DurationTime.ToString("P0"), cmSkins.configCenterLabel, GUILayout.Width(48));
 
@@ -544,27 +573,36 @@ namespace ContractModifier
 				}
 
 				if (paramType != null)
-					GUILayout.Label(paramType.Name, cmSkins.configHeader, GUILayout.MaxWidth(190));
+					GUILayout.Label(paramType.Name, cmSkins.configHeader, GUILayout.Width(280));
 				else
-					GUILayout.Label("Unknown", cmSkins.configHeader, GUILayout.MaxWidth(190));
+					GUILayout.Label("Unknown", cmSkins.configHeader, GUILayout.Width(280));
 				GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 
 			if (paramType.Generic)
 			{
-				GUILayout.Space(-4);
-				if (GUILayout.Button("Apply To All Parameters", cmSkins.configButton))
-				{
-					foreach (paramTypeContainer p in pList)
+				GUILayout.BeginHorizontal();
+					GUILayout.Space(180);
+					if (!dropDown)
 					{
-						p.RewardFund = paramType.RewardFund;
-						p.PenaltyFund = paramType.PenaltyFund;
-						p.RewardRep = paramType.RewardRep;
-						p.PenaltyRep = paramType.PenaltyRep;
-						p.RewardScience = paramType.RewardScience;
+						if (GUILayout.Button("Apply To All Parameters", GUILayout.MaxWidth(220)))
+						{
+							foreach (paramTypeContainer p in pList)
+							{
+								p.RewardFund = paramType.RewardFund;
+								p.PenaltyFund = paramType.PenaltyFund;
+								p.RewardRep = paramType.RewardRep;
+								p.PenaltyRep = paramType.PenaltyRep;
+								p.RewardScience = paramType.RewardScience;
+							}
+						}
 					}
-				}
+					else
+						GUILayout.Label("Apply To All Parameters", cmSkins.configButton, GUILayout.MaxWidth(220));
+				GUILayout.EndHorizontal();
 			}
+			else
+				GUILayout.Space(25);
 		}
 
 		//Parameter options
@@ -572,7 +610,7 @@ namespace ContractModifier
 		{
 			GUILayout.Space(12);
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Funds Reward: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Funds Reward: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				string percent = "";
 				if (!contractModifierScenario.Instance.allowZero && paramType.RewardFund <= 0.009)
@@ -597,7 +635,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Funds Penalty: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Funds Penalty: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && paramType.PenaltyFund <= 0.009)
 					percent = "0.1%";
@@ -621,7 +659,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Rep Reward: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Rep Reward: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && paramType.RewardRep <= 0.009)
 					percent = "0.1%";
@@ -645,7 +683,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Rep Penalty: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Rep Penalty: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && paramType.PenaltyRep <= 0.009)
 					percent = "0.1%";
@@ -669,7 +707,7 @@ namespace ContractModifier
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Science Reward: ", cmSkins.configLabel, GUILayout.Width(100));
+				GUILayout.Label("Science Reward: ", GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractModifierScenario.Instance.allowZero && paramType.RewardScience <= 0.009)
 					percent = "0.1%";
@@ -696,34 +734,34 @@ namespace ContractModifier
 		{
 			GUILayout.Space(30);
 			GUILayout.BeginHorizontal();
-				GUILayout.Space(20);
+				GUILayout.Space(10);
 				GUILayout.BeginVertical();
-					contractModifierScenario.Instance.allowZero = GUILayout.Toggle(contractModifierScenario.Instance.allowZero, "Allow 0% Values", cmSkins.configToggle);
+					contractModifierScenario.Instance.allowZero = GUILayout.Toggle(contractModifierScenario.Instance.allowZero, "Allow 0% Values");
 
-					contractModifierScenario.Instance.alterActive = GUILayout.Toggle(contractModifierScenario.Instance.alterActive, "Alter Active Contracts", cmSkins.configToggle);
+					contractModifierScenario.Instance.alterActive = GUILayout.Toggle(contractModifierScenario.Instance.alterActive, "Alter Active Contracts");
 
 					if (ToolbarManager.ToolbarAvailable)
-						contractModifierScenario.Instance.stockToolbar = GUILayout.Toggle(contractModifierScenario.Instance.stockToolbar, "Use Stock Toolbar", cmSkins.configToggle);
+						contractModifierScenario.Instance.stockToolbar = GUILayout.Toggle(contractModifierScenario.Instance.stockToolbar, "Use Stock Toolbar");
 
-					contractModifierScenario.Instance.showToolbar = GUILayout.Toggle(!contractModifierScenario.Instance.showToolbar, "Disable All Toolbars", cmSkins.configToggle);
+					contractModifierScenario.Instance.showToolbar = GUILayout.Toggle(!contractModifierScenario.Instance.showToolbar, "Disable All Toolbars");
 				GUILayout.EndVertical();
 
-				GUILayout.Space(20);
+				GUILayout.Space(30);
 
 				GUILayout.BeginVertical();
-					if (GUILayout.Button("Reset Contract Values", cmSkins.configButton))
+					if (GUILayout.Button("Reset Contract Values"))
 					{
 						dropDown = !dropDown;
 						rCPopup = !rCPopup;
 					}
 
-					if (GUILayout.Button("Reset Parameter Values", cmSkins.configButton))
+					if (GUILayout.Button("Reset Parameter Values"))
 					{
 						dropDown = !dropDown;
 						rPPopup = !rPPopup;
 					}
 
-					if (GUILayout.Button("Save To Config", cmSkins.configButton))
+					if (GUILayout.Button("Save To Config"))
 					{
 						dropDown = !dropDown;
 						wPopup = !wPopup;
@@ -736,7 +774,7 @@ namespace ContractModifier
 		//Draw some line textures to break up the window into sections
 		private void windowFrame(int id)
 		{
-			Rect r = new Rect(WindowRect.width - (WindowRect.width / 2) - 4, 265, (WindowRect.width / 2) + 2 , 4);
+			Rect r = new Rect(WindowRect.width - (WindowRect.width / 2) - 4, 295, (WindowRect.width / 2) + 2 , 4);
 			GUI.DrawTexture(r, cmSkins.footerBar);
 
 			r.x -= 2;
@@ -754,8 +792,8 @@ namespace ContractModifier
 			{
 				if (cDropDown)
 				{
-					ddRect = new Rect(40, 55, 280, 160);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					ddRect = new Rect(40, 65, 280, 160);
+					GUI.Box(ddRect, "");
 
 					for (int i = 0; i < cList.Count; i++)
 					{
@@ -773,8 +811,8 @@ namespace ContractModifier
 
 				else if (pDropDown)
 				{
-					ddRect = new Rect(WindowRect.width - 365, 55, 280, 160);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					ddRect = new Rect(WindowRect.width - 365, 65, 280, 160);
+					GUI.Box(ddRect, "");
 
 					for (int i = 0; i < pList.Count; i++)
 					{
@@ -793,14 +831,14 @@ namespace ContractModifier
 				else if (zPopup)
 				{
 					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 240, 130);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					GUI.Box(ddRect, "");
 					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 80);
 					GUI.Label(r, "Warning:\nContract values set to 0.0% may no longer be adjustable", cmSkins.resetBox);
 
 					r.x += 20;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.warnedZero = GUI.Toggle(r, contractModifierScenario.Instance.warnedZero, "Do not show this warning", cmSkins.configToggle);
+					contractModifierScenario.Instance.warnedZero = GUI.Toggle(r, contractModifierScenario.Instance.warnedZero, "Do not show this warning");
 
 					r.x += 65;
 					r.y += 30;
@@ -817,7 +855,7 @@ namespace ContractModifier
 				else if (rCPopup)
 				{
 					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 100, 280, 100);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					GUI.Box(ddRect, "");
 					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 70);
 					GUI.Label(r, "Contract Type:\n<b>" + contractType.Name + "</b>\nWill Be Reset To Default Values", cmSkins.resetBox);
 					r.x += 110;
@@ -835,7 +873,7 @@ namespace ContractModifier
 				else if (rPPopup)
 				{
 					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 100, 280, 100);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					GUI.Box(ddRect, "");
 					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 80);
 					GUI.Label(r, "Parameter Type:\n<b>" + paramType.Name + "</b>\nWill Be Reset To Default Values", cmSkins.resetBox);
 					r.x += 110;
@@ -853,7 +891,7 @@ namespace ContractModifier
 				else if (wPopup)
 				{
 					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 80, 240, 80);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					GUI.Box(ddRect, "");
 					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 45);
 					GUI.Label(r, "Overwrite Default Config File With Current Values?", cmSkins.resetBox);
 					r.x += 85;
@@ -871,14 +909,14 @@ namespace ContractModifier
 				else if (activePopup)
 				{
 					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 130, 280, 130);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					GUI.Box(ddRect, "");
 					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 60);
 					GUI.Label(r, "Contract Duration Can Only Be Adjusted For Newly Offered Contracts", cmSkins.resetBox);
 
 					r.x += 20;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.warnedAlterActive = GUI.Toggle(r, contractModifierScenario.Instance.warnedAlterActive, "Do not show this warning", cmSkins.configToggle);
+					contractModifierScenario.Instance.warnedAlterActive = GUI.Toggle(r, contractModifierScenario.Instance.warnedAlterActive, "Do not show this warning");
 
 					r.x += 100;
 					r.y += 30;
@@ -895,14 +933,14 @@ namespace ContractModifier
 				else if (toolbarPopup)
 				{
 					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 130, 280, 130);
-					GUI.Box(ddRect, "", cmSkins.dropDown);
+					GUI.Box(ddRect, "");
 					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 60);
 					GUI.Label(r, "Toolbar icon can only be reactived from the config file", cmSkins.resetBox);
 
 					r.x += 20;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.warnedToolbar = GUI.Toggle(r, contractModifierScenario.Instance.warnedToolbar, "Do not show this warning", cmSkins.configToggle);
+					contractModifierScenario.Instance.warnedToolbar = GUI.Toggle(r, contractModifierScenario.Instance.warnedToolbar, "Do not show this warning");
 
 					r.x += 100;
 					r.y += 30;
