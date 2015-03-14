@@ -90,6 +90,7 @@ namespace ContractModifier
 			resetBox = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.label);
 			resetBox.name = "ResetBox";
 			resetBox.fontSize = 16;
+			resetBox.fontStyle = FontStyle.Bold;
 			resetBox.normal.textColor = XKCDColors.VomitYellow;
 			resetBox.wordWrap = true;
 			resetBox.alignment = TextAnchor.UpperCenter;
@@ -97,6 +98,7 @@ namespace ContractModifier
 			resetButton = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.button);
 			resetButton.name = "ResetButton";
 			resetButton.fontSize = 15;
+			resetButton.fontStyle = FontStyle.Bold;
 			resetButton.alignment = TextAnchor.MiddleCenter;
 
 			smallLabel = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.label);
@@ -151,7 +153,7 @@ namespace ContractModifier
 
 			configToggle = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.toggle);
 			configToggle.name = "ConfigToggle";
-			configToggle.fontSize = 13;
+			configToggle.fontSize = 14;
 			configToggle.fontStyle = FontStyle.Bold;
 
 			configCenterLabel = new GUIStyle(configLabel);
