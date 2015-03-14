@@ -128,6 +128,12 @@ namespace ContractModifier
 			loadFromNode();
 		}
 
+		public override void OnEncodeToConfigNode()
+		{
+			maxOffer *= 10;
+			maxActive *= 10;
+		}
+
 		internal bool loadFromNode()
 		{
 			name = displayName(typeName);
