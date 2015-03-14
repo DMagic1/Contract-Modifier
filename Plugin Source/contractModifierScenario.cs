@@ -47,6 +47,8 @@ namespace ContractModifier
 			get
 			{
 				Game g = HighLogic.CurrentGame;
+				if (g == null)
+					return null;
 				try
 				{
 					var mod = g.scenarios.FirstOrDefault(m => m.moduleName == typeof(contractModifierScenario).Name);
@@ -116,6 +118,20 @@ namespace ContractModifier
 			}
 		}
 
+		private void OnDestroy()
+		{
+			if (configWindow != null)
+				Destroy(configWindow);
+			if (appLauncherButton != null)
+				Destroy(appLauncherButton);
+			if (blizzyToolbarButton != null)
+				Destroy(blizzyToolbarButton);
+
+			onContractChange.Remove(contractChanged);
+			onParamChange.Remove(paramChanged);
+			GameEvents.Contract.onOffered.Remove(contractOffered);
+		}
+
 		#region Save/Load
 
 		public override void OnLoad(ConfigNode node)
@@ -144,7 +160,7 @@ namespace ContractModifier
 
 			try
 			{
-				ConfigNode contractTypes = node.GetNode("Contracts_Modifier_Contract_Types");
+				ConfigNode contractTypes = node.GetNode("Contract_Types");
 
 				if (contractTypes != null)
 				{
@@ -166,7 +182,7 @@ namespace ContractModifier
 
 			try
 			{
-				ConfigNode paramTypes = node.GetNode("Contracts_Window_Parameter_Types");
+				ConfigNode paramTypes = node.GetNode("Parameter_Types");
 
 				if (paramTypes != null)
 				{
@@ -217,7 +233,7 @@ namespace ContractModifier
 
 			try
 			{
-				ConfigNode contractTypes = new ConfigNode("Contracts_Window_Contract_Types");
+				ConfigNode contractTypes = new ConfigNode("Contract_Types");
 
 				for (int i = 0; i < ContractValuesNode.ContractTypeCount; i++)
 				{
@@ -243,7 +259,7 @@ namespace ContractModifier
 			//Save values for each parameter type
 			try
 			{
-				ConfigNode paramTypes = new ConfigNode("Contracts_Window_Parameter_Types");
+				ConfigNode paramTypes = new ConfigNode("Parameter_Types");
 
 				for (int i = 0; i < ContractValuesNode.ParameterTypeCount; i++)
 				{
