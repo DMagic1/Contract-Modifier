@@ -45,7 +45,7 @@ namespace ContractModifier
 		private bool dropDown, cDropDown, pDropDown, rCPopup, rPPopup, wPopup, zPopup, toolbarPopup, activePopup;
 		private bool spacecenterLocked, trackingLocked, editorLocked;
 		private bool stockToolbar = true;
-		private bool alterActive, allowZero, showToolbar;
+		private bool alterActive, allowZero, disableToolbar;
 		private string version;
 		private Rect ddRect;
 		private Vector2 cScroll, pScroll;
@@ -94,7 +94,7 @@ namespace ContractModifier
 			stockToolbar = contractModifierScenario.Instance.stockToolbar;
 			alterActive = contractModifierScenario.Instance.alterActive;
 			allowZero = contractModifierScenario.Instance.allowZero;
-			showToolbar = contractModifierScenario.Instance.showToolbar;
+			disableToolbar = contractModifierScenario.Instance.disableToolbar;
 		}
 
 		protected override void OnDestroy()
@@ -219,17 +219,13 @@ namespace ContractModifier
 				{
 					contractModifierScenario.Instance.appLauncherButton = gameObject.AddComponent<cmStockToolbar>();
 					if (contractModifierScenario.Instance.blizzyToolbarButton != null)
-					{
 						Destroy(contractModifierScenario.Instance.blizzyToolbarButton);
-					}
 				}
 				else
 				{
 					contractModifierScenario.Instance.blizzyToolbarButton = gameObject.AddComponent<cmToolbar>();
 					if (contractModifierScenario.Instance.appLauncherButton != null)
-					{
 						Destroy(contractModifierScenario.Instance.appLauncherButton);
-					}
 				}
 			}
 
@@ -237,9 +233,11 @@ namespace ContractModifier
 			{
 				if (allowZero != contractModifierScenario.Instance.allowZero)
 				{
-					if (!allowZero)
+					allowZero = contractModifierScenario.Instance.allowZero;
+					if (allowZero)
 					{
 						contractModifierScenario.Instance.allowZero = false;
+						allowZero = false;
 						dropDown = true;
 						zPopup = true;
 					}
@@ -250,24 +248,54 @@ namespace ContractModifier
 			{
 				if (alterActive != contractModifierScenario.Instance.alterActive)
 				{
-					if (!alterActive)
+					alterActive = contractModifierScenario.Instance.alterActive;
+					if (alterActive)
 					{
 						contractModifierScenario.Instance.alterActive = false;
+						alterActive = false;
 						dropDown = true;
 						activePopup = true;
 					}
 				}
 			}
 
-			if (!contractModifierScenario.Instance.warnedToolbar)
+			if (disableToolbar != contractModifierScenario.Instance.disableToolbar)
 			{
-				if (showToolbar != contractModifierScenario.Instance.CMNode.ShowToolbar)
+				disableToolbar = contractModifierScenario.Instance.disableToolbar;
+				if (disableToolbar)
 				{
-					if (showToolbar)
+					if (!contractModifierScenario.Instance.warnedToolbar)
 					{
-						contractModifierScenario.Instance.showToolbar = true;
-						dropDown = true;
-						toolbarPopup = true;
+						if (disableToolbar)
+						{
+							contractModifierScenario.Instance.disableToolbar = false;
+							disableToolbar = false;
+							dropDown = true;
+							toolbarPopup = true;
+						}
+					}
+					else
+					{
+						if (contractModifierScenario.Instance.blizzyToolbarButton != null)
+							Destroy(contractModifierScenario.Instance.blizzyToolbarButton);
+						if (contractModifierScenario.Instance.appLauncherButton != null)
+							Destroy(contractModifierScenario.Instance.appLauncherButton);
+						
+					}
+				}
+				else
+				{
+					if (stockToolbar)
+					{
+						contractModifierScenario.Instance.appLauncherButton = gameObject.AddComponent<cmStockToolbar>();
+						if (contractModifierScenario.Instance.blizzyToolbarButton != null)
+							Destroy(contractModifierScenario.Instance.blizzyToolbarButton);
+					}
+					else
+					{
+						contractModifierScenario.Instance.blizzyToolbarButton = gameObject.AddComponent<cmToolbar>();
+						if (contractModifierScenario.Instance.appLauncherButton != null)
+							Destroy(contractModifierScenario.Instance.appLauncherButton);
 					}
 				}
 			}
@@ -736,35 +764,58 @@ namespace ContractModifier
 			GUILayout.BeginHorizontal();
 				GUILayout.Space(10);
 				GUILayout.BeginVertical();
-					contractModifierScenario.Instance.allowZero = GUILayout.Toggle(contractModifierScenario.Instance.allowZero, "Allow 0% Values");
+					if (!dropDown)
+					{
+						contractModifierScenario.Instance.allowZero = GUILayout.Toggle  (contractModifierScenario.Instance.allowZero, " Allow 0% Values");
 
-					contractModifierScenario.Instance.alterActive = GUILayout.Toggle(contractModifierScenario.Instance.alterActive, "Alter Active Contracts");
+						contractModifierScenario.Instance.alterActive = GUILayout.Toggle	(contractModifierScenario.Instance.alterActive, " Alter Active Contracts");
 
-					if (ToolbarManager.ToolbarAvailable)
-						contractModifierScenario.Instance.stockToolbar = GUILayout.Toggle(contractModifierScenario.Instance.stockToolbar, "Use Stock Toolbar");
+						contractModifierScenario.Instance.disableToolbar = GUILayout.Toggle (contractModifierScenario.Instance.disableToolbar, " Disable All Toolbars");
 
-					contractModifierScenario.Instance.showToolbar = GUILayout.Toggle(!contractModifierScenario.Instance.showToolbar, "Disable All Toolbars");
+						if (ToolbarManager.ToolbarAvailable && !contractModifierScenario.Instance.disableToolbar)
+							contractModifierScenario.Instance.stockToolbar = GUILayout.Toggle   (contractModifierScenario.Instance.stockToolbar, " Use Stock Toolbar");
+					}
+					else
+					{
+						GUILayout.Toggle(contractModifierScenario.Instance.allowZero, " Allow 0% Values");
+
+						GUILayout.Toggle(contractModifierScenario.Instance.alterActive, " Alter Active Contracts");
+
+						GUILayout.Toggle(contractModifierScenario.Instance.disableToolbar, " Disable All Toolbars");
+
+						if (ToolbarManager.ToolbarAvailable && !contractModifierScenario.Instance.disableToolbar)
+							GUILayout.Toggle(contractModifierScenario.Instance.stockToolbar, " Use Stock Toolbar");
+					}
 				GUILayout.EndVertical();
 
 				GUILayout.Space(30);
 
 				GUILayout.BeginVertical();
-					if (GUILayout.Button("Reset Contract Values"))
+					if (!dropDown)
 					{
-						dropDown = !dropDown;
-						rCPopup = !rCPopup;
-					}
+						if (GUILayout.Button("Reset Contract Values"))
+						{
+							dropDown = !dropDown;
+							rCPopup = !rCPopup;
+						}
 
-					if (GUILayout.Button("Reset Parameter Values"))
-					{
-						dropDown = !dropDown;
-						rPPopup = !rPPopup;
-					}
+						if (GUILayout.Button("Reset Parameter Values"))
+						{
+							dropDown = !dropDown;
+							rPPopup = !rPPopup;
+						}
 
-					if (GUILayout.Button("Save To Config"))
+						if (GUILayout.Button("Save To Config"))
+						{
+							dropDown = !dropDown;
+							wPopup = !wPopup;
+						}
+					}
+					else
 					{
-						dropDown = !dropDown;
-						wPopup = !wPopup;
+						GUILayout.Label("Reset Contract Values", cmSkins.configButton);
+						GUILayout.Label("Reset Parameter Values", cmSkins.configButton);
+						GUILayout.Label("Save To Config", cmSkins.configButton);
 					}
 				GUILayout.EndVertical();
 				GUILayout.Space(20);
@@ -828,39 +879,16 @@ namespace ContractModifier
 					}
 				}
 
-				else if (zPopup)
-				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 240, 130);
-					GUI.Box(ddRect, "");
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 80);
-					GUI.Label(r, "Warning:\nContract values set to 0.0% may no longer be adjustable", cmSkins.resetBox);
-
-					r.x += 20;
-					r.y += 60;
-					r.height = 30;
-					contractModifierScenario.Instance.warnedZero = GUI.Toggle(r, contractModifierScenario.Instance.warnedZero, "Do not show this warning");
-
-					r.x += 65;
-					r.y += 30;
-					r.width = 70;
-					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
-					{
-						dropDown = false;
-						zPopup = false;
-						contractModifierScenario.Instance.allowZero = true;
-						allowZero = true;
-					}
-				}
-
 				else if (rCPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 100, 280, 100);
+					ddRect = new Rect(WindowRect.width - 270, WindowRect.height - 120, 260, 120);
 					GUI.Box(ddRect, "");
-					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 70);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 250, 80);
 					GUI.Label(r, "Contract Type:\n<b>" + contractType.Name + "</b>\nWill Be Reset To Default Values", cmSkins.resetBox);
-					r.x += 110;
-					r.y += 60;
-					r.width = 70;
+
+					r.x += 85;
+					r.y += 80;
+					r.width = 80;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
 					{
@@ -872,13 +900,14 @@ namespace ContractModifier
 
 				else if (rPPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 100, 280, 100);
+					ddRect = new Rect(WindowRect.width - 270, WindowRect.height - 120, 260, 120);
 					GUI.Box(ddRect, "");
-					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 80);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 250, 80);
 					GUI.Label(r, "Parameter Type:\n<b>" + paramType.Name + "</b>\nWill Be Reset To Default Values", cmSkins.resetBox);
-					r.x += 110;
-					r.y += 60;
-					r.width = 70;
+
+					r.x += 85;
+					r.y += 80;
+					r.width = 80;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
 					{
@@ -890,13 +919,14 @@ namespace ContractModifier
 
 				else if (wPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 80, 240, 80);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 100, 240, 100);
 					GUI.Box(ddRect, "");
 					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 45);
 					GUI.Label(r, "Overwrite Default Config File With Current Values?", cmSkins.resetBox);
-					r.x += 85;
-					r.y += 40;
-					r.width = 70;
+
+					r.x += 70;
+					r.y += 60;
+					r.width = 80;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
 					{
@@ -906,21 +936,45 @@ namespace ContractModifier
 					}
 				}
 
-				else if (activePopup)
+				else if (zPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 130, 280, 130);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 240, 130);
 					GUI.Box(ddRect, "");
-					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 60);
-					GUI.Label(r, "Contract Duration Can Only Be Adjusted For Newly Offered Contracts", cmSkins.resetBox);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 80);
+					GUI.Label(r, "Warning:\nContract values set to 0.0% may no longer be adjustable", cmSkins.resetBox);
 
-					r.x += 20;
+					r.x += 10;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.warnedAlterActive = GUI.Toggle(r, contractModifierScenario.Instance.warnedAlterActive, "Do not show this warning");
+					contractModifierScenario.Instance.warnedZero = GUI.Toggle(r, contractModifierScenario.Instance.warnedZero, " Do not show this warning");
 
-					r.x += 100;
+					r.x += 60;
 					r.y += 30;
-					r.width = 70;
+					r.width = 80;
+					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
+					{
+						dropDown = false;
+						zPopup = false;
+						contractModifierScenario.Instance.allowZero = true;
+						allowZero = true;
+					}
+				}
+
+				else if (activePopup)
+				{
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 240, 130);
+					GUI.Box(ddRect, "");
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 80);
+					GUI.Label(r, "Contract Duration Can Only Be Adjusted For Newly Offered Contracts", cmSkins.resetBox);
+
+					r.x += 10;
+					r.y += 60;
+					r.height = 30;
+					contractModifierScenario.Instance.warnedAlterActive = GUI.Toggle(r, contractModifierScenario.Instance.warnedAlterActive, " Do not show this warning");
+
+					r.x += 60;
+					r.y += 30;
+					r.width = 80;
 					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
 					{
 						dropDown = false;
@@ -932,25 +986,29 @@ namespace ContractModifier
 
 				else if (toolbarPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 130, 280, 130);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 240, 130);
 					GUI.Box(ddRect, "");
-					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 60);
-					GUI.Label(r, "Toolbar icon can only be reactived from the config file", cmSkins.resetBox);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 80);
+					GUI.Label(r, "Warning:\nToolbar icon can only be reactived from the config file", cmSkins.resetBox);
 
-					r.x += 20;
+					r.x += 10;
 					r.y += 60;
 					r.height = 30;
-					contractModifierScenario.Instance.warnedToolbar = GUI.Toggle(r, contractModifierScenario.Instance.warnedToolbar, "Do not show this warning");
+					contractModifierScenario.Instance.warnedToolbar = GUI.Toggle(r, contractModifierScenario.Instance.warnedToolbar, " Do not show this warning");
 
-					r.x += 100;
+					r.x += 60;
 					r.y += 30;
-					r.width = 70;
+					r.width = 80;
 					if (GUI.Button(r, "Confirm", cmSkins.resetButton))
 					{
 						dropDown = false;
 						toolbarPopup = false;
-						contractModifierScenario.Instance.showToolbar = false;
-						showToolbar = false;
+						contractModifierScenario.Instance.disableToolbar = true;
+						disableToolbar = true;
+						if (contractModifierScenario.Instance.blizzyToolbarButton != null)
+							Destroy(contractModifierScenario.Instance.blizzyToolbarButton);
+						if (contractModifierScenario.Instance.appLauncherButton != null)
+							Destroy(contractModifierScenario.Instance.appLauncherButton);
 					}
 				}
 
