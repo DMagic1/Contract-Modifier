@@ -38,11 +38,11 @@ namespace ContractModifier
 	public class ContractValuesNode : DMCM_ConfigNodeStorage
 	{
 		[Persistent]
-		private bool showToolbar = true;
+		private bool disableToolbar = false;
 		[Persistent]
 		private bool allowZero = false;
 		[Persistent]
-		private bool alterActive = true;
+		private bool alterActive = false;
 		[Persistent]
 		private bool stockToolbar = true;
 		[Persistent]
@@ -87,7 +87,6 @@ namespace ContractModifier
 
 		public override void OnEncodeToConfigNode()
 		{
-			LogFormatted_DebugOnly("Encoding top node");
 			try
 			{
 				ContractTypeConfigs = masterContractList.Values.ToList();
@@ -108,7 +107,7 @@ namespace ContractModifier
 
 			if (contractModifierScenario.Instance != null)
 			{
-				showToolbar = contractModifierScenario.Instance.showToolbar;
+				disableToolbar = contractModifierScenario.Instance.disableToolbar;
 				stockToolbar = contractModifierScenario.Instance.stockToolbar;
 				allowZero = contractModifierScenario.Instance.allowZero;
 				alterActive = contractModifierScenario.Instance.alterActive;
@@ -324,9 +323,9 @@ namespace ContractModifier
 			}
 		}
 
-		public bool ShowToolbar
+		public bool DisableToolbar
 		{
-			get { return showToolbar; }
+			get { return disableToolbar; }
 		}
 
 		public bool AllowZero
