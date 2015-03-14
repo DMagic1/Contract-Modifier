@@ -70,7 +70,7 @@ namespace ContractModifier
 		public bool allowZero = false;
 		public bool alterActive = false;
 		public bool stockToolbar = true;
-		public bool showToolbar = true;
+		public bool disableToolbar = false;
 		public bool warnedZero = false;
 		public bool warnedToolbar = false;
 		public bool warnedAlterActive = false;
@@ -99,17 +99,20 @@ namespace ContractModifier
 			onParamChange.Add(paramChanged);
 			GameEvents.Contract.onOffered.Add(contractOffered);
 
-			if ((stockToolbar || !ToolbarManager.ToolbarAvailable) && cmNode.ShowToolbar)
+			if (!disableToolbar)
 			{
-				appLauncherButton = gameObject.AddComponent<cmStockToolbar>();
-				if (blizzyToolbarButton != null)
-					Destroy(blizzyToolbarButton);
-			}
-			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
-			{
-				blizzyToolbarButton = gameObject.AddComponent<cmToolbar>();
-				if (appLauncherButton != null)
-					Destroy(appLauncherButton);
+				if (stockToolbar || !ToolbarManager.ToolbarAvailable)
+				{
+					appLauncherButton = gameObject.AddComponent<cmStockToolbar>();
+					if (blizzyToolbarButton != null)
+						Destroy(blizzyToolbarButton);
+				}
+				else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
+				{
+					blizzyToolbarButton = gameObject.AddComponent<cmToolbar>();
+					if (appLauncherButton != null)
+						Destroy(appLauncherButton);
+				}
 			}
 		}
 
@@ -121,18 +124,20 @@ namespace ContractModifier
 			if (cmNode == null)
 				cmNode = new ContractValuesNode(cmConfigLoad.fileName);
 
-			allowZero = cmNode.AllowZero;
-			alterActive = cmNode.AlterActive;
-			stockToolbar = cmNode.StockToolbar;
-			showToolbar = cmNode.ShowToolbar;
-			warnedAlterActive = cmNode.WarnedAlterActive;
-			warnedToolbar = cmNode.WarnedToolbar;
-			warnedZero = cmNode.WarnedZero;
+			if (cmNode != null)
+			{
+				allowZero = cmNode.AllowZero;
+				alterActive = cmNode.AlterActive;
+				stockToolbar = cmNode.StockToolbar;
+				disableToolbar = cmNode.DisableToolbar;
+				warnedAlterActive = cmNode.WarnedAlterActive;
+				warnedToolbar = cmNode.WarnedToolbar;
+				warnedZero = cmNode.WarnedZero;
+			}
 
 			bool.TryParse(node.GetValue("allowZero"), out allowZero);
 			bool.TryParse(node.GetValue("alterActive"), out alterActive);
 			bool.TryParse(node.GetValue("stockToolbar"), out stockToolbar);
-			bool.TryParse(node.GetValue("showToolbar"), out showToolbar);
 			bool.TryParse(node.GetValue("warnedAlterActive"), out warnedAlterActive);
 			bool.TryParse(node.GetValue("warnedToolbar"), out warnedToolbar);
 			bool.TryParse(node.GetValue("warnedZero"), out warnedZero);
@@ -182,13 +187,16 @@ namespace ContractModifier
 			}
 
 			//Start the window object
-			try
+			if (!disableToolbar)
 			{
-				configWindow = gameObject.AddComponent<contractConfig>();
-			}
-			catch (Exception e)
-			{
-				DMCM_MBE.LogFormatted("Contract Modifier Windows Cannot Be Started: {0}", e);
+				try
+				{
+					configWindow = gameObject.AddComponent<contractConfig>();
+				}
+				catch (Exception e)
+				{
+					DMCM_MBE.LogFormatted("Contract Modifier Windows Cannot Be Started: {0}", e);
+				}
 			}
 
 			if (ContractValuesNode.getCType("GlobalSettings") == null)
@@ -203,7 +211,6 @@ namespace ContractModifier
 			node.AddValue("allowZero", allowZero);
 			node.AddValue("alterActive", alterActive);
 			node.AddValue("stockToolbar", stockToolbar);
-			node.AddValue("showToolbar", showToolbar);
 			node.AddValue("warnedAlterActive", warnedAlterActive);
 			node.AddValue("warnedToolbar", warnedToolbar);
 			node.AddValue("warnedZero", warnedZero);
@@ -493,6 +500,8 @@ namespace ContractModifier
 
 		#endregion
 
+		#region Internal Methods
+
 		public List<paramTypeContainer> setParamTypes(List<paramTypeContainer> pList)
 		{
 			pList = new List<paramTypeContainer>();
@@ -561,6 +570,7 @@ namespace ContractModifier
 			return cList;
 		}
 
+		#endregion
 
 	}
 }
