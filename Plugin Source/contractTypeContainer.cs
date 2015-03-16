@@ -37,6 +37,9 @@ using UnityEngine;
 
 namespace ContractModifier
 {
+	/// <summary>
+	/// A container to information about contract reward values
+	/// </summary>
 	public class contractTypeContainer : DMCM_ConfigNodeStorage
 	{
 		[Persistent]
@@ -137,15 +140,15 @@ namespace ContractModifier
 		internal bool loadFromNode()
 		{
 			name = displayName(typeName);
-			defaultFundReward = fundReward = fundReward.returnNonZero();
-			defaultFundAdvance = fundAdvance = fundAdvance.returnNonZero();
-			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero();
-			defaultRepReward = repReward = repReward.returnNonZero();
-			defaultRepPenalty = repPenalty = repPenalty.returnNonZero();
-			defaultScienceReward = scienceReward = scienceReward.returnNonZero();
-			defaultDuration = durationTime = durationTime.returnNonZero();
-			defaultMaxOffer = maxOffer = (maxOffer / 10f).returnNonZero();
-			defaultMaxActive = maxActive = (maxActive / 10f).returnNonZero();
+			defaultFundReward = RewardFund = fundReward;
+			defaultFundAdvance = AdvanceFund = fundAdvance;
+			defaultFundPenalty = PenaltyFund = fundPenalty;
+			defaultRepReward = RewardRep = repReward;
+			defaultRepPenalty = PenaltyRep = repPenalty;
+			defaultScienceReward = RewardScience = scienceReward;
+			defaultDuration = DurationTime = durationTime;
+			defaultMaxOffer = MaxOffer = (maxOffer / 10f);
+			defaultMaxActive = MaxActive = (maxActive / 10f);
 
 			if (typeName == "GlobalSettings")
 				generic = true;
@@ -328,13 +331,9 @@ namespace ContractModifier
 			{
 				if (value > 0 && value <= 10)
 				{
-					if (contractModifierScenario.Instance != null)
-					{
-						if (!contractModifierScenario.Instance.allowZero && value == 0.00f)
-							value = 0.001f;
-					}
-					if (value == 0.00f)
-						value = 0.0000000001f;
+					if (value <= 0.1f)
+						value = 0.1f;
+
 					durationTime = value;
 				}
 			}
@@ -345,17 +344,18 @@ namespace ContractModifier
 			get { return maxOffer; }
 			set
 			{
-				if (!contractConfiguratorType)
+				if (value >= 0 && value <= 10)
 				{
-					if (value >= 0 && value <= 10)
-						maxOffer = value;
-				}
-				else
-				{
-					if (value >= 0.1f && value <= 10)
-						maxOffer = value;
-					else if (value >= 0)
-						maxOffer = 0.1f;
+					if (contractConfiguratorType)
+					{
+						if (value <= 0.1f)
+							value = 0.1f;
+					}
+
+					if (value <= 1)
+						maxOffer = value.Mathf_Round(1);
+					else
+						maxOffer = value.Mathf_Round(2);
 				}
 			}
 		}
@@ -365,17 +365,18 @@ namespace ContractModifier
 			get { return maxActive; }
 			set
 			{
-				if (!contractConfiguratorType)
+				if (value >= 0 && value <= 10)
 				{
-					if (value >= 0 && value <= 10)
-						maxActive = value;
-				}
-				else
-				{
-					if (value >= 0.1f && value <= 10)
-						maxActive = value;
-					else if (value >= 0)
-						maxActive = 0.1f;
+					if (contractConfiguratorType)
+					{
+						if (value <= 0.1f)
+							value = 0.1f;
+					}
+
+					if (value <= 1)
+						maxActive = value.Mathf_Round(1);
+					else
+						maxActive = value.Mathf_Round(2);
 				}
 			}
 		}
