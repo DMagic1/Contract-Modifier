@@ -134,24 +134,6 @@ namespace ContractModifier.Framework
             return blnReturn;
         }
 
-		public Boolean Load(ConfigNode node)
-		{
-			bool loaded = false;
-			try
-			{
-				LogFormatted_DebugOnly("Loading ConfigNode");
-				//plug the node in to the object
-				ConfigNode.LoadObjectFromConfig(this, node);
-				loaded = true;
-			}
-			catch(Exception ex)
-			{
-				LogFormatted("Failed to Load ConfigNode from node({0})-Error:{1}", node.name, ex.Message);
-				loaded = false;
-			}
-			return loaded;
-		}
-
         /// <summary>
         /// Saves the object to a ConfigNode structure in the previously supplied file
         /// </summary>
