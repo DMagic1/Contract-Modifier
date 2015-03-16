@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Contracts;
 using ContractModifier.Framework;
 
 namespace ContractModifier
@@ -39,7 +40,8 @@ namespace ContractModifier
 	{
 		private static bool contractsWindowPlusContractLoaded = false;
 		private static bool contractsWindowPlusParameterLoaded = false;
-		private static bool contractConfiguratorLoaded = false;
+		private static bool contractConfiguratorCTLoaded = false;
+		private static bool contractConfiguratorCCLoaded = false;
 
 		public static bool ContractsWindowPlusContractLoaded
 		{
@@ -51,9 +53,14 @@ namespace ContractModifier
 			get { return contractsWindowPlusParameterLoaded; }
 		}
 
-		public static bool ContractConfiguratorLoaded
+		public static bool ContractConfiguratorCTLoaded
 		{
-			get { return contractConfiguratorLoaded; }
+			get { return contractConfiguratorCTLoaded; }
+		}
+
+		public static bool ContractConfiguratorCCLoaded
+		{
+			get { return contractConfiguratorCCLoaded; }
 		}
 
 		private const string contractsWindowPlusTypeName = "ContractsWindow.contractUtils";
@@ -61,12 +68,16 @@ namespace ContractModifier
 		private const string contractsPlusParameterMethodName = "UpdateParameterType";
 		private const string contractConfiguratorTypeName = "ContractConfigurator.ContractType";
 		private const string contractConfiguratorTypeMethod = "AllValidContractTypeNames";
+		private const string contractConfiguratorCCTypeName = "ContractConfigurator.ConfiguredContract";
+		private const string contractConfiguratorCCTypeNameMethod = "contractTypeName";
 
 		private delegate void ContractPlusUpdateContract(Type t);
 		private delegate void ContractPlusUpdateParameter(Type t);
+		private delegate string ContractConfiguratorTypeName(Contract c);
 
 		private static ContractPlusUpdateContract _UpdateContract;
 		private static ContractPlusUpdateParameter _UpdateParam;
+		private static ContractConfiguratorTypeName _CCTypeName;
 
 		internal static IEnumerable<string> ContractConfiguratorTypeNames = null;
 
@@ -76,17 +87,25 @@ namespace ContractModifier
 		{
 			contractsWindowPlusContractLoaded = checkForContractsWindowPlusContractUpdate();
 			contractsWindowPlusParameterLoaded = checkForContractsWindowPlusParameterUpdate();
-			contractConfiguratorLoaded = checkForContractConfigurator();
+			contractConfiguratorCTLoaded = checkForContractConfiguratorType();
+			contractConfiguratorCCLoaded = checkForContractConfiguratorTypeName();
 		}
 
 		internal static void UpdateContractValues(Type t)
 		{
-			_UpdateContract(t);
+			if (t != null)
+				_UpdateContract(t);
 		}
 
 		internal static void UpdateParameterValues(Type t)
 		{
-			_UpdateParam(t);
+			if (t != null)
+				_UpdateParam(t);
+		}
+
+		internal static string CCTypeName(Contract c)
+		{
+			return _CCTypeName(c);
 		}
 
 		private static bool checkForContractsWindowPlusContractUpdate()
@@ -162,7 +181,7 @@ namespace ContractModifier
 			return false;
 		}
 
-		private static bool checkForContractConfigurator()
+		private static bool checkForContractConfiguratorType()
 		{
 			try
 			{
@@ -171,7 +190,7 @@ namespace ContractModifier
 
 				if (CConfigType == null)
 				{
-					DMCM_MBE.LogFormatted("Contract Configurator Type Not Found");
+					DMCM_MBE.LogFormatted("Contract Configurator Type [{0}] Not Found", contractConfiguratorTypeName);
 					return false;
 				}
 
@@ -179,7 +198,7 @@ namespace ContractModifier
 
 				if (CConfigTypeProperty == null)
 				{
-					DMCM_MBE.LogFormatted("Contract Configurator Property Not Loaded");
+					DMCM_MBE.LogFormatted("Contract Configurator Property [{0}] Not Loaded", contractConfiguratorTypeMethod);
 					return false;
 				}
 
@@ -189,14 +208,56 @@ namespace ContractModifier
 
 				ContractConfiguratorTypeNames = enumerableNames;
 
+				DMCM_MBE.LogFormatted("Contract Configurator Contract Type Names Assigned");
+
 				return ContractConfiguratorTypeNames != null;
 			}
 			catch (Exception e)
 			{
-				DMCM_MBE.LogFormatted("Error While Loading Contract Configurator Method: {0}", e);
+				DMCM_MBE.LogFormatted("Error While Loading Contract Configurator Types Property: {0}", e);
 			}
 
 			return false;
 		}
+
+		private static bool checkForContractConfiguratorTypeName()
+		{
+			if (_CCTypeName != null)
+				return true;
+
+			try
+			{
+				Type CConfigType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
+						.SingleOrDefault(t => t.FullName == contractConfiguratorCCTypeName);
+
+				if (CConfigType == null)
+				{
+					DMCM_MBE.LogFormatted("Contract Configurator Type [{0}] Not Found", contractConfiguratorCCTypeName);
+					return false;
+				}
+
+				MethodInfo CConfigNameMethod = CConfigType.GetMethod(contractConfiguratorCCTypeNameMethod, new Type[] { typeof(Contract) });
+
+				if (CConfigNameMethod == null)
+				{
+					DMCM_MBE.LogFormatted("Contract Configurator Method [{0}] Not Loaded", contractConfiguratorCCTypeNameMethod);
+					return false;
+				}
+
+				_CCTypeName = (ContractConfiguratorTypeName)Delegate.CreateDelegate(typeof(ContractConfiguratorTypeName), CConfigNameMethod);
+
+				DMCM_MBE.LogFormatted("Contract Configurator Contract Type Name Method Assigned");
+
+				return _CCTypeName != null;
+
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error While Loading Contract Configurator Name Method: {0}", e);
+			}
+
+			return false;
+		}
+
 	}
 }
