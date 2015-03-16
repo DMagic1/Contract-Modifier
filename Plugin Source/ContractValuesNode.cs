@@ -35,10 +35,15 @@ using ContractModifier.Framework;
 
 namespace ContractModifier
 {
+	/// <summary>
+	/// A storage object for loading and saving data from a config file
+	/// </summary>
 	public class ContractValuesNode : DMCM_ConfigNodeStorage
 	{
 		[Persistent]
 		private bool disableToolbar = false;
+		[Persistent]
+		private bool disableSaveSpecificValues = false;
 		[Persistent]
 		private bool allowZero = false;
 		[Persistent]
@@ -67,7 +72,6 @@ namespace ContractModifier
 			try
 			{
 				masterContractList = ContractTypeConfigs.ToDictionary(a => a.TypeName, a => a);
-				LogFormatted_DebugOnly("Contract Dict Loaded; {0} Objects", masterContractList.Count);
 			}
 			catch (Exception e)
 			{
@@ -77,7 +81,6 @@ namespace ContractModifier
 			try
 			{
 				masterParamList = ParameterTypeConfigs.ToDictionary(a => a.TypeName, a => a);
-				LogFormatted_DebugOnly("Parameter Dict Loaded; {0} Objects", masterParamList.Count);
 			}
 			catch (Exception e)
 			{
@@ -126,7 +129,7 @@ namespace ContractModifier
 
 			Load();
 
-			if (cmAssemblyLoad.ContractConfiguratorLoaded)
+			if (cmAssemblyLoad.ContractConfiguratorCTLoaded)
 				loadCConfigTypes();
 
 			checkAllContractTypes();
@@ -326,6 +329,11 @@ namespace ContractModifier
 		public bool DisableToolbar
 		{
 			get { return disableToolbar; }
+		}
+
+		public bool DisableSaveSpecificValues
+		{
+			get { return disableSaveSpecificValues; }
 		}
 
 		public bool AllowZero
