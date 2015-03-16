@@ -6,6 +6,8 @@
 
 //The config file can be updated in-game by selecting the "Save To Config" button in the window
 
+//In general it is better to set the values in-game and save them, rather than setting them by hand
+
 //The following is an annotated copy of the config file; examples of contract and parameter types are included
 
 ContractValuesNode
