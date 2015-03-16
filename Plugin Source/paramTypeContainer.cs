@@ -36,6 +36,9 @@ using UnityEngine;
 
 namespace ContractModifier
 {
+	/// <summary>
+	/// A container to hold information about parameter reward values
+	/// </summary>
 	public class paramTypeContainer : DMCM_ConfigNodeStorage
 	{
 		[Persistent]
@@ -122,11 +125,11 @@ namespace ContractModifier
 		internal bool loadFromNode()
 		{
 			name = displayName(typeName);
-			defaultFundReward = fundReward = fundReward.returnNonZero();
-			defaultFundPenalty = fundPenalty = fundPenalty.returnNonZero();
-			defaultRepReward = repReward = repReward.returnNonZero();
-			defaultRepPenalty = repPenalty = repPenalty.returnNonZero();
-			defaultScienceReward = scienceReward = scienceReward.returnNonZero();
+			defaultFundReward = RewardFund = fundReward;
+			defaultFundPenalty = PenaltyFund = fundPenalty;
+			defaultRepReward = RewardRep = repReward;
+			defaultRepPenalty = PenaltyRep = repPenalty;
+			defaultScienceReward = RewardScience = scienceReward;
 
 			if (typeName == "GlobalSettings")
 				generic = true;
