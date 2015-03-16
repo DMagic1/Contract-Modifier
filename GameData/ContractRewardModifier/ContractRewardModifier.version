@@ -1,0 +1,31 @@
+{
+     "NAME":"Contract Reward Modifier",
+	 "URL":"https://raw.githubusercontent.com/DMagic1/Contract-Modifier/master/GameData/ContractRewardModifier/ContractRewardModifier.version",
+     "DOWNLOAD":"https://kerbalstuff.com/mod/520/Contract%20Reward%20Modifier/download/1.0",
+     "GITHUB":{
+         "USERNAME":"DMagic1",
+         "REPOSITORY":"Contract-Modifier",
+         "ALLOW_PRE_RELEASE":false,
+     },
+     "VERSION":{
+         "MAJOR":1,
+         "MINOR":0,
+         "PATCH":1,
+         "BUILD":0
+     },
+     "KSP_VERSION":{
+         "MAJOR":0,
+         "MINOR":90,
+         "PATCH":0
+     },
+     "KSP_VERSION_MIN":{
+         "MAJOR":0,
+         "MINOR":90,
+         "PATCH":0
+     },
+     "KSP_VERSION_MAX":{
+         "MAJOR":0,
+         "MINOR":90,
+         "PATCH":0
+     }
+ } 
