@@ -60,4 +60,4 @@ The code is released under the [MIT license][CRMLicense]; all art assets are rel
 [shield:ckan]: https://img.shields.io/badge/CKAN-Indexed-brightgreen.svg
 [shield:support-toolbar]: http://img.shields.io/badge/works%20with%20Blizzy's%20Toolbar-1.7.8-7c69c0.svg
 [shield:support-ccfg]: https://img.shields.io/badge/works%20with%20Contract%20Configurator-7.0-yellowgreen.svg
-[shield:support-cwplus]: https://img.shields.io/badge/works%20with%20Contracts%20Window%20%2B-v4.0-orange.svg
+[shield:support-cwplus]: https://img.shields.io/badge/works%20with%20Contracts%20Window%20%2B-4.0-orange.svg
