@@ -64,12 +64,12 @@ namespace ContractModifier
 
 		protected override void OnGUIOnceOnly()
 		{
-			windowTex = GameDatabase.Instance.GetTexture("ContractModifier/Textures/WindowTex", false);
-			dropDownTex = GameDatabase.Instance.GetTexture("ContractModifier/Textures/DropDownTex", false);
-			footerBar = GameDatabase.Instance.GetTexture("ContractModifier/Textures/FooterBar", false);
-			verticalBar = GameDatabase.Instance.GetTexture("ContractModifier/Textures/VerticalBar", false);
-			toolbarIcon = GameDatabase.Instance.GetTexture("ContractModifier/Textures/ContractsIconApp", false);
-			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
+			windowTex = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/WindowTex", false);
+			dropDownTex = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/DropDownTex", false);
+			footerBar = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/FooterBar", false);
+			verticalBar = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/VerticalBar", false);
+			toolbarIcon = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/ContractsIconApp", false);
+			buttonHover = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/ButtonHover", false);
 
 			cmUnitySkin = DMCM_SkinsLibrary.CopySkin(DMCM_SkinsLibrary.DefSkinType.Unity);
 			DMCM_SkinsLibrary.AddSkin("CMUnitySkin", cmUnitySkin);
