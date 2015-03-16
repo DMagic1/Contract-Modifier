@@ -67,7 +67,7 @@ namespace ContractModifier
 				default: version = ainfoV.InformationalVersion; break;
 			}
 
-			WindowCaption = "Contract Configuration";
+			WindowCaption = "Contract Reward Modifier";
 			WindowRect = new Rect(40, 80, 840, 380);
 			WindowStyle = cmSkins.newWindowStyle;
 			Visible = false;
@@ -353,6 +353,8 @@ namespace ContractModifier
 						{
 							foreach (contractTypeContainer c in cList)
 							{
+								float[] originals = (float[])c.ContractValues.Clone();
+
 								c.RewardFund = contractType.RewardFund;
 								c.AdvanceFund = contractType.AdvanceFund;
 								c.PenaltyFund = contractType.PenaltyFund;
@@ -362,6 +364,9 @@ namespace ContractModifier
 								c.DurationTime = contractType.DurationTime;
 								c.MaxOffer = contractType.MaxOffer;
 								c.MaxActive = contractType.MaxActive;
+
+								if (contractModifierScenario.Instance.alterActive)
+									contractModifierScenario.onContractChange.Fire(originals, c);
 							}
 						}
 					}
@@ -389,7 +394,7 @@ namespace ContractModifier
 
 				Rect r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 260;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -413,7 +418,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 260;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -437,7 +442,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 260;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -461,7 +466,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 260;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -485,7 +490,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 260;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -509,7 +514,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 260;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -529,7 +534,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 260;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -554,7 +559,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 35;
-				r.width = 110;
+				r.width = 130;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -564,7 +569,7 @@ namespace ContractModifier
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
-				GUILayout.Space(115);
+				GUILayout.Space(145);
 
 				string actives = "";
 				if (contractType.MaxActive < 10)
@@ -577,7 +582,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 35;
-				r.width = 110;
+				r.width = 130;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
@@ -617,11 +622,16 @@ namespace ContractModifier
 						{
 							foreach (paramTypeContainer p in pList)
 							{
+								float[] originals = (float[])p.ParamValues.Clone();
+
 								p.RewardFund = paramType.RewardFund;
 								p.PenaltyFund = paramType.PenaltyFund;
 								p.RewardRep = paramType.RewardRep;
 								p.PenaltyRep = paramType.PenaltyRep;
 								p.RewardScience = paramType.RewardScience;
+
+								if (contractModifierScenario.Instance.alterActive)
+									contractModifierScenario.onParamChange.Fire(originals, p);
 							}
 						}
 					}
@@ -649,7 +659,7 @@ namespace ContractModifier
 
 				Rect r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 250;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
 
@@ -673,7 +683,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 250;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
 
@@ -697,7 +707,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 250;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
 
@@ -721,7 +731,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 250;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
 
@@ -745,7 +755,7 @@ namespace ContractModifier
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
-				r.width = 200;
+				r.width = 250;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
 
@@ -1087,9 +1097,15 @@ namespace ContractModifier
 			return newVal;
 		}
 
-		//Check here to see if any values have changed and update contracts accordingly
-		//Only active when updating active contracts is allowed
-		//the float[] is a Clone of the original because arrays are reference objects
+		/// <summary>
+		/// Check here to see if any values have changed and update contracts accordingly
+		/// Only active when updating active contracts is allowed
+		/// the float[] is a Clone of the original because arrays are reference objects
+		/// </summary>
+		/// <param name="newF">The new value from the slider</param>
+		/// <param name="pos">The index of the value in the float[]</param>
+		/// <param name="originals">The array of original values</param>
+		/// <param name="type">Contract or Parameter type</param>
 		private void eventCheck(float newF, int pos, float[] originals, int type)
 		{
 			if (contractModifierScenario.Instance.alterActive)
@@ -1123,7 +1139,7 @@ namespace ContractModifier
 			cActive = c.MaxActive.reverseLog(allowZero);
 		}
 
-		//Reset all of the slider values for the newly selected parameter type
+		///Reset all of the slider values for the newly selected parameter type
 		private void setParameterType(paramTypeContainer p, bool allowZero)
 		{
 			paramType = p;
@@ -1134,12 +1150,14 @@ namespace ContractModifier
 			pSRew = p.RewardScience.reverseLog(allowZero);
 		}
 
-		//Reset the current contract type to its default values
-		//Values always default to 100% for now; use config file later
-		//Active contracts updated only if allowed
+		/// <summary>
+		/// Reset the current contract type to its default values
+		/// Active contracts updated only if allowed
+		/// </summary>
 		private void resetContractToDefault()
 		{
 			float[] originals = (float[])contractType.ContractValues.Clone();
+
 			contractType.RewardFund = contractType.DefaultFundReward;
 			contractType.AdvanceFund = contractType.DefaultFundAdvance;
 			contractType.PenaltyFund = contractType.DefaultFundPenalty;
@@ -1151,14 +1169,18 @@ namespace ContractModifier
 			contractType.MaxActive = contractType.DefaultMaxActive;
 
 			setContractType(contractType, contractModifierScenario.Instance.allowZero);
+
 			if (contractModifierScenario.Instance.alterActive)
 				contractModifierScenario.onContractChange.Fire(originals, contractType);
 		}
 
-		//Reset the current parameter type to its default values
+		/// <summary>
+		/// Reset the current parameter type to its default values
+		/// </summary>
 		private void resetParameToDefault()
 		{
 			float[] originals = (float[])paramType.ParamValues.Clone();
+
 			paramType.RewardFund = paramType.DefaultFundReward;
 			paramType.PenaltyFund = paramType.DefaultFundPenalty;
 			paramType.RewardRep = paramType.DefaultRepReward;
@@ -1166,6 +1188,7 @@ namespace ContractModifier
 			paramType.RewardScience = paramType.DefaultScienceReward;
 
 			setParameterType(paramType, contractModifierScenario.Instance.allowZero);
+
 			if (contractModifierScenario.Instance.alterActive)
 				contractModifierScenario.onParamChange.Fire(originals, paramType);
 		}
