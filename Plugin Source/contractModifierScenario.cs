@@ -160,7 +160,8 @@ namespace ContractModifier
 			{
 				bool.TryParse(node.GetValue("allowZero"), out allowZero);
 				bool.TryParse(node.GetValue("alterActive"), out alterActive);
-				bool.TryParse(node.GetValue("stockToolbar"), out stockToolbar);
+				if (!bool.TryParse(node.GetValue("stockToolbar"), out stockToolbar))
+					stockToolbar = true;
 				bool.TryParse(node.GetValue("warnedAlterActive"), out warnedAlterActive);
 				bool.TryParse(node.GetValue("warnedToolbar"), out warnedToolbar);
 				bool.TryParse(node.GetValue("warnedZero"), out warnedZero);
