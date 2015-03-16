@@ -16,6 +16,7 @@
 #### Authors and Contributors
 
 [DMagic][DMagic]: Author and maintainer
+
 [TriggerAu][TriggerAu]: Contract Reward Modifier uses a version of TriggerAu's KSP Plugin Framework
 
 #### License
@@ -47,7 +48,7 @@ The code is released under the [MIT license][CRMLicense]; all art assets are rel
 
 [KSP:developers]: https://kerbalspaceprogram.com/index.php
 [CKAN:org]: http://ksp-ckan.org/
-[CRMLicense]: https://raw.githubusercontent.com/DMagic1/Contract-Modifier/master/GameData/ContractRewardModifier/License.txt
+[CRMLicense]: https://github.com/DMagic1/Contract-Modifier/blob/master/GameData/ContractRewardModifier/License.txt
 
 [cconfig:release]: http://forum.kerbalspaceprogram.com/threads/101604
 [toolbar:release]: http://forum.kerbalspaceprogram.com/threads/60863
