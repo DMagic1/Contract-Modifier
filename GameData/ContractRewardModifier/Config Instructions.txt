@@ -1,0 +1,55 @@
+//Included in this folder is a copy of the file: ContractModifierConfig.cfg
+//This .cfg file is used to set the default values for all contract and parameter types
+//A number of other options for the addon are also included
+
+//The file MUST be in the following location: Kerbal Space Program/GameData/ContractRewardModifier/ContractRewardModifier.cfg
+
+//The config file can be updated in-game by selecting the "Save To Config" button in the window
+
+//The following is an annotated copy of the config file; examples of contract and parameter types are included
+
+ContractValuesNode
+{
+	disableToolbar = False			//Prevents the toolbar button from loading if set to True
+	disableSaveSpecificValues = False	//Prevents any save-specific settings from being loaded if set to True
+	allowZero = False			//Allows values to be set to near-zero; this can be overridden in a save file
+	alterActive = False			//Allows currently active contracts to be altered; this can be overridden in a save file
+	stockToolbar = True			//If Blizzy78's Toolbar is installed this can be used to use it instead of the stock app launcher; this can be overridden in a save file
+	warnedZero = False			//Prevents the warning popup when activating "Allow Zero" in-game; this can be overridden in a save file
+	warnedToolbar = False			//Prevents the warning popup when disable the toolbar in-game; this can be overridden in a save file
+	warnedAlterActive = False		//Prevents the warning popup when activating "Alter Active Contracts" in-game; this can be overridden in a save file
+
+	
+	ContractTypeConfigs			//All contract types are found under this node
+	{
+		Item				//An example of a contract type
+		{
+			typeName = SatelliteContract		//The contract types name; this is found in the game code and must match the real name exactly
+			fundReward = 0.5			//The reward and penalty values can be set from 0 to 10; this corresponds to 0 - 1000%, or a 0 - 10X multiplier.
+			fundPenalty = 1.8			//Values set to 0 in the config file will be replaced by 0.0000000001
+			fundAdvance = 1.2
+			repReward = 0.7
+			repPenalty = 1.3
+			scienceReward = 0
+			durationTime = 0.6			//Duration time values below 0.1 (10%) are not allowed; anything below that will be increased to 0.1 
+			maxOffer = 4				//Values can be set to 0 to prevent any offers of this type
+			maxActive = 6				//A value of 100 means no limit on offered or active contracts
+			contractConfiguratorType = False	//Contract Configurator contracts require special handling; this value should not be altered by hand	
+		}
+	}
+
+
+	ParameterTypeConfigs			//All parameter types are found under this node
+	{
+		Item
+		{
+			typeName = CollectScience		//Parameter type name
+			fundReward = 0.2			//Reward and penalty values are set the same as described above
+			fundPenalty = 3.5
+			repReward = 0.3
+			repPenalty = 4.0
+			scienceReward = 0.2
+			contractConfiguratorType = False	//The same as described above
+		}
+	}
+}
