@@ -68,7 +68,7 @@ namespace ContractModifier
 			dropDownTex = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/DropDownTex", false);
 			footerBar = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/FooterBar", false);
 			verticalBar = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/VerticalBar", false);
-			toolbarIcon = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/ContractsIconApp", false);
+			toolbarIcon = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/ContractModifierAppIcon", false);
 			buttonHover = GameDatabase.Instance.GetTexture("ContractRewardModifier/Textures/ButtonHover", false);
 
 			cmUnitySkin = DMCM_SkinsLibrary.CopySkin(DMCM_SkinsLibrary.DefSkinType.Unity);

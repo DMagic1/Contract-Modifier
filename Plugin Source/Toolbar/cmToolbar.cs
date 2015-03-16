@@ -50,8 +50,8 @@ namespace ContractModifier.Toolbar
 
 			contractButton = ToolbarManager.Instance.add("ContractRewardModifier", "CMToolbarID");
 
-			if (File.Exists(Path.Combine(new DirectoryInfo(KSPUtil.ApplicationRootPath).FullName, "GameData/ContractRewardModifier/Textures/ContractsIcon.png").Replace("\\", "/")))
-				contractButton.TexturePath = "ContractRewardModifier/Textures/ContractsIcon";
+			if (File.Exists(Path.Combine(new DirectoryInfo(KSPUtil.ApplicationRootPath).FullName, "GameData/ContractRewardModifier/Textures/ContractModifierToolbarIcon.png").Replace("\\", "/")))
+				contractButton.TexturePath = "ContractRewardModifier/Textures/ContractModifierToolbarIcon";
 			else
 				contractButton.TexturePath = "000_Toolbar/resize-cursor";
 
