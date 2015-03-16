@@ -46,6 +46,9 @@ namespace ContractModifier
 		{
 			get
 			{
+				if (HighLogic.LoadedScene == GameScenes.MAINMENU)
+					return null;
+
 				Game g = HighLogic.CurrentGame;
 				if (g == null)
 					return null;
@@ -76,6 +79,7 @@ namespace ContractModifier
 		public bool warnedZero = false;
 		public bool warnedToolbar = false;
 		public bool warnedAlterActive = false;
+		private bool disableSaveLoading = false;
 
 		internal cmStockToolbar appLauncherButton;
 		internal cmToolbar blizzyToolbarButton;
@@ -142,6 +146,7 @@ namespace ContractModifier
 
 			if (cmNode != null)
 			{
+				disableSaveLoading = cmNode.DisableSaveSpecificValues;
 				allowZero = cmNode.AllowZero;
 				alterActive = cmNode.AlterActive;
 				stockToolbar = cmNode.StockToolbar;
@@ -151,56 +156,61 @@ namespace ContractModifier
 				warnedZero = cmNode.WarnedZero;
 			}
 
-			bool.TryParse(node.GetValue("allowZero"), out allowZero);
-			bool.TryParse(node.GetValue("alterActive"), out alterActive);
-			bool.TryParse(node.GetValue("stockToolbar"), out stockToolbar);
-			bool.TryParse(node.GetValue("warnedAlterActive"), out warnedAlterActive);
-			bool.TryParse(node.GetValue("warnedToolbar"), out warnedToolbar);
-			bool.TryParse(node.GetValue("warnedZero"), out warnedZero);
-
-			try
+			if (!disableSaveLoading)
 			{
-				ConfigNode contractTypes = node.GetNode("Contract_Types");
+				bool.TryParse(node.GetValue("allowZero"), out allowZero);
+				bool.TryParse(node.GetValue("alterActive"), out alterActive);
+				bool.TryParse(node.GetValue("stockToolbar"), out stockToolbar);
+				bool.TryParse(node.GetValue("warnedAlterActive"), out warnedAlterActive);
+				bool.TryParse(node.GetValue("warnedToolbar"), out warnedToolbar);
+				bool.TryParse(node.GetValue("warnedZero"), out warnedZero);
 
-				if (contractTypes != null)
+				try
 				{
-					foreach (ConfigNode contractType in contractTypes.GetNodes("Contract_Type"))
+					ConfigNode contractTypes = node.GetNode("Contract_Types");
+
+					if (contractTypes != null)
 					{
-						if (contractType != null)
+						foreach (ConfigNode contractType in contractTypes.GetNodes("Contract_Type"))
 						{
-							string contractTypeName = contractType.GetValue("TypeName");
-							string valuesString = contractType.GetValue("ContractValues");
-							stringContractParse(valuesString, contractTypeName);
+							if (contractType != null)
+							{
+								string contractTypeName = contractType.GetValue("TypeName");
+								string valuesString = contractType.GetValue("ContractValues");
+								stringContractParse(valuesString, contractTypeName);
+							}
 						}
 					}
 				}
-			}
-			catch (Exception e)
-			{
-				DMCM_MBE.LogFormatted("Contract Type List Cannot Be Generated Or Loaded: {0}", e);
-			}
-
-			try
-			{
-				ConfigNode paramTypes = node.GetNode("Parameter_Types");
-
-				if (paramTypes != null)
+				catch (Exception e)
 				{
-					foreach (ConfigNode paramType in paramTypes.GetNodes("Parameter_Type"))
+					DMCM_MBE.LogFormatted("Contract Type List Cannot Be Generated Or Loaded: {0}", e);
+				}
+
+				try
+				{
+					ConfigNode paramTypes = node.GetNode("Parameter_Types");
+
+					if (paramTypes != null)
 					{
-						if (paramType != null)
+						foreach (ConfigNode paramType in paramTypes.GetNodes("Parameter_Type"))
 						{
-							string paramTypeName = paramType.GetValue("TypeName");
-							string valuesString = paramType.GetValue("ParameterValues");
-							stringParamParse(valuesString, paramTypeName);
+							if (paramType != null)
+							{
+								string paramTypeName = paramType.GetValue("TypeName");
+								string valuesString = paramType.GetValue("ParameterValues");
+								stringParamParse(valuesString, paramTypeName);
+							}
 						}
 					}
 				}
+				catch (Exception e)
+				{
+					DMCM_MBE.LogFormatted("Parameter Type List Cannot Be Generated Or Loaded: {0}", e);
+				}
 			}
-			catch (Exception e)
-			{
-				DMCM_MBE.LogFormatted("Parameter Type List Cannot Be Generated Or Loaded: {0}", e);
-			}
+			else
+				DMCM_MBE.LogFormatted("All save-specific settings disabled; values loaded from config file...");
 
 			//Start the window object
 			if (!disableToolbar)
@@ -224,63 +234,66 @@ namespace ContractModifier
 
 		public override void OnSave(ConfigNode node)
 		{
-			node.AddValue("allowZero", allowZero);
-			node.AddValue("alterActive", alterActive);
-			node.AddValue("stockToolbar", stockToolbar);
-			node.AddValue("warnedAlterActive", warnedAlterActive);
-			node.AddValue("warnedToolbar", warnedToolbar);
-			node.AddValue("warnedZero", warnedZero);
-
-			try
+			if (!disableSaveLoading)
 			{
-				ConfigNode contractTypes = new ConfigNode("Contract_Types");
+				node.AddValue("allowZero", allowZero);
+				node.AddValue("alterActive", alterActive);
+				node.AddValue("stockToolbar", stockToolbar);
+				node.AddValue("warnedAlterActive", warnedAlterActive);
+				node.AddValue("warnedToolbar", warnedToolbar);
+				node.AddValue("warnedZero", warnedZero);
 
-				for (int i = 0; i < ContractValuesNode.ContractTypeCount; i++)
+				try
 				{
-					contractTypeContainer c = ContractValuesNode.getCType(i);
-					if (c != null)
+					ConfigNode contractTypes = new ConfigNode("Contract_Types");
+
+					for (int i = 0; i < ContractValuesNode.ContractTypeCount; i++)
 					{
-						ConfigNode contractType = new ConfigNode("Contract_Type");
+						contractTypeContainer c = ContractValuesNode.getCType(i);
+						if (c != null)
+						{
+							ConfigNode contractType = new ConfigNode("Contract_Type");
 
-						contractType.AddValue("TypeName", c.TypeName);
-						contractType.AddValue("ContractValues", stringConcat(c));
+							contractType.AddValue("TypeName", c.TypeName);
+							contractType.AddValue("ContractValues", stringConcat(c));
 
-						contractTypes.AddNode(contractType);
+							contractTypes.AddNode(contractType);
+						}
 					}
+
+					node.AddNode(contractTypes);
+				}
+				catch (Exception e)
+				{
+					DMCM_MBE.LogFormatted("Contract Types Cannot Be Saved: {0}", e);
 				}
 
-				node.AddNode(contractTypes);
-			}
-			catch (Exception e)
-			{
-				DMCM_MBE.LogFormatted("Contract Types Cannot Be Saved: {0}", e);
-			}
-
-			//Save values for each parameter type
-			try
-			{
-				ConfigNode paramTypes = new ConfigNode("Parameter_Types");
-
-				for (int i = 0; i < ContractValuesNode.ParameterTypeCount; i++)
+				//Save values for each parameter type
+				try
 				{
-					paramTypeContainer p = ContractValuesNode.getPType(i);
+					ConfigNode paramTypes = new ConfigNode("Parameter_Types");
 
-					if (p != null)
+					for (int i = 0; i < ContractValuesNode.ParameterTypeCount; i++)
 					{
-						ConfigNode paramType = new ConfigNode("Parameter_Type");
+						paramTypeContainer p = ContractValuesNode.getPType(i);
 
-						paramType.AddValue("TypeName", p.TypeName);
-						paramType.AddValue("ParameterValues", stringConcat(p));
+						if (p != null)
+						{
+							ConfigNode paramType = new ConfigNode("Parameter_Type");
 
-						paramTypes.AddNode(paramType);
+							paramType.AddValue("TypeName", p.TypeName);
+							paramType.AddValue("ParameterValues", stringConcat(p));
+
+							paramTypes.AddNode(paramType);
+						}
 					}
-				}
 
-				node.AddNode(paramTypes);
-			}
-			catch (Exception e)
-			{
-				DMCM_MBE.LogFormatted("Parameter Type List Cannot Be Saved: {0}", e);
+					node.AddNode(paramTypes);
+				}
+				catch (Exception e)
+				{
+					DMCM_MBE.LogFormatted("Parameter Type List Cannot Be Saved: {0}", e);
+				}
 			}
 		}
 
@@ -372,7 +385,26 @@ namespace ContractModifier
 		private void contractOffered(Contract c)
 		{
 			Type contractT = c.GetType();
-			contractTypeContainer cC = ContractValuesNode.getCType(contractT.Name);
+			contractTypeContainer cC = null;
+
+			if (contractT.Name == "ConfiguredContract")
+			{
+				if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+				{
+					string name = cmAssemblyLoad.CCTypeName(c);
+					cC = ContractValuesNode.getCType(name);
+				}
+				else
+				{
+					DMCM_MBE.LogFormatted("Contract Configurator Contract Type Detected, But Type Name Can't Be Determined; CC Possibly Out Of Date...");
+					return;
+				}
+			}
+			else
+			{
+				cC = ContractValuesNode.getCType(contractT.Name);
+			}
+
 			if (cC == null)
 				return;
 
@@ -386,12 +418,31 @@ namespace ContractModifier
 				int offered = 0;
 				for (int i = 0; i < cList.Count; i++)
 				{
-					if (cList[i].GetType() == contractT)
+					if (cList[i].GetType().Name == "ConfiguredContract")
 					{
-						if (cList[i].ContractState == Contract.State.Active)
-							active++;
-						else if (cList[i].ContractState == Contract.State.Offered)
-							offered++;
+						if (!cC.CConfigType)
+							continue;
+						if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+						{
+							string name = cmAssemblyLoad.CCTypeName(cList[i]);
+							if (cC.TypeName == name)
+							{
+								if (cList[i].ContractState == Contract.State.Active)
+									active++;
+								else if (cList[i].ContractState == Contract.State.Offered)
+									offered++;
+							}
+						}
+					}
+					else
+					{
+						if (cList[i].GetType() == contractT)
+						{
+							if (cList[i].ContractState == Contract.State.Active)
+								active++;
+							else if (cList[i].ContractState == Contract.State.Offered)
+								offered++;
+						}
 					}
 				}
 				int remainingSlots = (int)(cC.MaxActive * 10) - active;
@@ -427,11 +478,10 @@ namespace ContractModifier
 			for (int i = 0; i < cList.Count; i++)
 			{
 				if (cList[i].ContractState == Contract.State.Active || cList[i].ContractState == Contract.State.Offered)
-				{
 					updateParameterValues(p, cList[i], originals);
-				}
 			}
-			if (cmAssemblyLoad.ContractsWindowPlusParameterLoaded)
+
+			if (cmAssemblyLoad.ContractsWindowPlusParameterLoaded && !p.CConfigType)
 				cmAssemblyLoad.UpdateParameterValues(p.ParamType);
 		}
 
@@ -444,25 +494,44 @@ namespace ContractModifier
 			for (int i = 0; i < cList.Count; i++)
 			{
 				if (cList[i].ContractState == Contract.State.Active || cList[i].ContractState == Contract.State.Offered)
-				{
 					updateContractValues(c, cList[i], originals);
-				}
 			}
-			if (cmAssemblyLoad.ContractsWindowPlusContractLoaded)
+
+			if (cmAssemblyLoad.ContractsWindowPlusContractLoaded && !c.CConfigType)
 				cmAssemblyLoad.UpdateContractValues(c.ContractType);
 		}
 
 		private void updateContractValues(contractTypeContainer cC, Contract c, float[] O)
 		{
-			if (c.GetType() == cC.ContractType)
+			if (cC.CConfigType)
 			{
-				c.FundsCompletion = (c.FundsCompletion / O[0]) * cC.RewardFund;
-				c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
-				c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
-				c.ReputationCompletion = (c.ReputationCompletion / O[3]) * cC.RewardRep;
-				c.ReputationFailure = (c.ReputationFailure / O[4]) * cC.PenaltyRep;
-				c.ScienceCompletion = (c.ScienceCompletion / O[5]) * cC.RewardScience;
-				c.TimeDeadline = (c.TimeDeadline / O[6]) * cC.DurationTime;
+				if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+				{
+					string name = cmAssemblyLoad.CCTypeName(c);
+					if (cC.TypeName == name)
+					{
+						c.FundsCompletion = (c.FundsCompletion / O[0]) * cC.RewardFund;
+						c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
+						c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
+						c.ReputationCompletion = (c.ReputationCompletion / O[3]) * cC.RewardRep;
+						c.ReputationFailure = (c.ReputationFailure / O[4]) * cC.PenaltyRep;
+						c.ScienceCompletion = (c.ScienceCompletion / O[5]) * cC.RewardScience;
+						c.TimeDeadline = (c.TimeDeadline / O[6]) * cC.DurationTime;
+					}
+				}
+			}
+			else
+			{
+				if (c.GetType() == cC.ContractType)
+				{
+					c.FundsCompletion = (c.FundsCompletion / O[0]) * cC.RewardFund;
+					c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
+					c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
+					c.ReputationCompletion = (c.ReputationCompletion / O[3]) * cC.RewardRep;
+					c.ReputationFailure = (c.ReputationFailure / O[4]) * cC.PenaltyRep;
+					c.ScienceCompletion = (c.ScienceCompletion / O[5]) * cC.RewardScience;
+					c.TimeDeadline = (c.TimeDeadline / O[6]) * cC.DurationTime;
+				}
 			}
 		}
 
