@@ -62,19 +62,19 @@ The Contract Reward Modifier window presents a set of sliders that allow for cha
 ![][CRM:Slider-reward]
 
   * The sliders below control the amount given for each different reward and penalty type.
-  *Strategy values are not directly affected by these sliders, i.e. setting science to 0.1% won't affect the science rewards given while using the science strategy.
-  *The sliders are half-way log-scale; the left half of the slider allows for 0.1 - 100% of the original value, while the right half allows for 100-1000% of the original.
+  * Strategy values are not directly affected by these sliders, i.e. setting science to 0.1% won't affect the science rewards given while using the science strategy.
+  * The sliders are half-way log-scale; the left half of the slider allows for 0.1 - 100% of the original value, while the right half allows for 100-1000% of the original.
   
 #### Duration slider
 ![][CRM:Slider-duration]
 
-  *Contract duration can be adjusted from 10-1000%, but will only affect newly offered contracts.
+  * Contract duration can be adjusted from 10-1000%, but will only affect newly offered contracts.
   
 #### Contract limit sliders
 ![][CRM:Slider-limits]
 
-  *The maximum number of offered and active contracts of a type can be specified; any contracts beyond this amount will be rejected when the system tries to offer new contracts.
-  *All Contract Configurator contracts are can only be set to allow 1 or more contracts to be offered.
+  * The maximum number of offered and active contracts of a type can be specified; any contracts beyond this amount will be rejected when the system tries to offer new contracts.
+  * All Contract Configurator contracts are can only be set to allow 1 or more contracts to be offered.
 
 #### Additional Settings
 -----------------------------------------
@@ -82,15 +82,15 @@ The Contract Reward Modifier window presents a set of sliders that allow for cha
 #### Allow for 0% values
 ![][CRM:Warn-zero]
 
-  *By default the values only go down to 0.1%; there is an option to allow for nearly 0% (0.00000001%) using the **Allow 0% Values** toggle.
-    *Using this may cause odd rounding errors and prevent further adjustments from being made to any active contracts/parameters of that type.
+  * By default the values only go down to 0.1%; there is an option to allow for nearly 0% (0.00000001%) using the **Allow 0% Values** toggle.
+    * Using this may cause odd rounding errors and prevent further adjustments from being made to any active contracts/parameters of that type.
 
 #### Alter active contracts
 ![][CRM:Warn-alteractive]
 
-  *A toggle option is available to **Alter Active Contracts** as well as newly offered contracts.
-    *Turning this on and off while adjusting values may cause problems with reward values.
-    *Be default it is off; but you should stick with either turning it on, or leaving it off; don't go back and forth.
+  * A toggle option is available to **Alter Active Contracts** as well as newly offered contracts.
+    * Turning this on and off while adjusting values may cause problems with reward values.
+    * Be default it is off; but you should stick with either turning it on, or leaving it off; don't go back and forth.
  
 #### Disable toolbars
 ![][CRM:Warn-toolbar]
@@ -99,7 +99,7 @@ The Contract Reward Modifier window presents a set of sliders that allow for cha
     * This can be used if you have set the values you want and don't need the toolbar icon taking up space.
   * Toolbars can be re-enabled by changing the **disableToolbar** field to **True** at the top of the config file. 
   
-  *If [Blizzy78's Toolbar][toolbar:release] is installed you can switch between it and the stock app launcher using the **Use Stock Toolbar** toggle.
+  * If [Blizzy78's Toolbar][toolbar:release] is installed you can switch between it and the stock app launcher using the **Use Stock Toolbar** toggle.
 
 ####Reset Contract and Parameter values to default
 ![][CRM:Reset-contract]
@@ -108,7 +108,7 @@ The Contract Reward Modifier window presents a set of sliders that allow for cha
   * Contract/Parameter amounts can be reverted to the default values set in your config file using the **Reset Values** button.
 
 #### Save values to a global config file
-![][Warn-save]
+![][CRM:Warn-save]
   
   * The current values can be saved to the global config file in your GameData folder using the **Save To Config** button.
     * Values saved to the config file will serve as the default for current save games.
