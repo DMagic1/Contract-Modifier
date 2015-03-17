@@ -139,7 +139,7 @@ The Contract Reward Modifier window presents a set of sliders that allow for cha
 [toolbar:release]: http://forum.kerbalspaceprogram.com/threads/60863
 [cwplus:release]: http://forum.kerbalspaceprogram.com/threads/91034
 
-[shield:license-mit]: http://img.shields.io/:license-mit-a31f34.svg
+[shield:license-mit]: http://img.shields.io/badge/license-mit-a31f34.svg
 [shield:license-cc-by-sa]: http://img.shields.io/badge/license-CC%20BY--SA-green.svg
 [shield:support-ksp]: http://img.shields.io/badge/for%20KSP-v0.90-bad455.svg
 [shield:ckan]: https://img.shields.io/badge/CKAN-Indexed-brightgreen.svg
