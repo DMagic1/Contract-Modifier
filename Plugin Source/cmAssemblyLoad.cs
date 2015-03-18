@@ -87,8 +87,12 @@ namespace ContractModifier
 		{
 			contractsWindowPlusContractLoaded = checkForContractsWindowPlusContractUpdate();
 			contractsWindowPlusParameterLoaded = checkForContractsWindowPlusParameterUpdate();
-			contractConfiguratorCTLoaded = checkForContractConfiguratorType();
 			contractConfiguratorCCLoaded = checkForContractConfiguratorTypeName();
+		}
+
+		internal static void loadCCcontractTypes()
+		{
+			contractConfiguratorCTLoaded = checkForContractConfiguratorType();
 		}
 
 		internal static void UpdateContractValues(Type t)
@@ -208,7 +212,12 @@ namespace ContractModifier
 
 				ContractConfiguratorTypeNames = enumerableNames;
 
-				DMCM_MBE.LogFormatted("Contract Configurator Contract Type Names Assigned");
+				DMCM_MBE.LogFormatted("Contract Configurator Contract Type Names Assigned: {0} Elements Found", enumerableNames.Count());
+
+				foreach (string s in enumerableNames)
+				{
+					DMCM_MBE.LogFormatted_DebugOnly("CC Contract: {0}", s);
+				}
 
 				return ContractConfiguratorTypeNames != null;
 			}
