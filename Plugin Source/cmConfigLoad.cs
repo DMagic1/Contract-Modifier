@@ -38,6 +38,8 @@ namespace ContractModifier
 	public class cmConfigLoad : DMCM_MBE
 	{
 		private static ContractValuesNode topConfigNode;
+		private static bool loaded = false;
+
 		internal const string fileName = "ContractModifierConfig.cfg";
 
 		public static ContractValuesNode TopNode
@@ -47,9 +49,23 @@ namespace ContractModifier
 
 		protected override void Start()
 		{
+			DontDestroyOnLoad(this);
 			cmAssemblyLoad.loadReflectionMethods();
+		}
 
-			topConfigNode = new ContractValuesNode(fileName);
+		protected override void Update()
+		{
+			if (!loaded)
+			{
+				if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.EDITOR)
+				{
+					cmAssemblyLoad.loadCCcontractTypes();
+
+					topConfigNode = new ContractValuesNode(fileName);
+
+					loaded = true;
+				}
+			}
 		}
 	}
 }
