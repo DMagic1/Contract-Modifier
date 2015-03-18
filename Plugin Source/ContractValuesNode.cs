@@ -228,7 +228,7 @@ namespace ContractModifier
 			}
 			catch (Exception e)
 			{
-				DMCM_MBE.LogFormatted("Error loading contract types: {0}", e);
+				LogFormatted("Error loading contract types: {0}", e);
 			}
 		}
 
@@ -241,7 +241,7 @@ namespace ContractModifier
 				if (getCType(t.Name) == null)
 				{
 					if (!addToContractList(new contractTypeContainer(t)))
-						DMCM_MBE.LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", t.Name);
+						LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", t.Name);
 				}
 			}
 		}
@@ -268,7 +268,7 @@ namespace ContractModifier
 			}
 			catch (Exception e)
 			{
-				DMCM_MBE.LogFormatted("Error loading parameter types: {0}", e);
+				LogFormatted("Error loading parameter types: {0}", e);
 			}
 		}
 
@@ -287,7 +287,7 @@ namespace ContractModifier
 				if (getPType(t.Name) == null)
 				{
 					if (!addToParamList(new paramTypeContainer(t)))
-						DMCM_MBE.LogFormatted("Error During Parameter Type Loading; [{0}] Cannot Be Added To Parameter Type List", t.Name);
+						LogFormatted("Error During Parameter Type Loading; [{0}] Cannot Be Added To Parameter Type List", t.Name);
 				}
 			}
 		}
@@ -299,7 +299,7 @@ namespace ContractModifier
 				if (getCType(s) == null)
 				{
 					if (!addToContractList(new contractTypeContainer(s, true)))
-						DMCM_MBE.LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", s);
+						LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", s);
 				}
 			}
 		}
