@@ -78,21 +78,11 @@ namespace ContractModifier
 		private float[] contractValues = new float[9];
 		private Type contractType;
 		private string name = "";
-		private Contract contractC = null;
 		private bool generic = false;
 
 		internal contractTypeContainer (Type CType)
 		{
 			contractType = CType;
-			try
-			{
-			contractC = (Contract)Activator.CreateInstance(CType);
-			}
-			catch (Exception e)
-			{
-				DMCM_MBE.LogFormatted("This Contract Type: {0} Does Not Have An Empty Constructor And Will Be Skipped: {1]", CType.Name, e);
-				
-			}
 			typeName = CType.Name;
 			name = displayName(typeName);
 
@@ -178,11 +168,6 @@ namespace ContractModifier
 		private string displayName (string s)
 		{
 			return Regex.Replace(s, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
-		}
-
-		public Contract ContractC
-		{
-			get { return contractC; }
 		}
 
 		public Type ContractType

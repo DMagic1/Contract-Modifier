@@ -63,7 +63,6 @@ namespace ContractModifier
 		private float defaultScienceReward = 1.0f;
 
 		private Type paramType = null;
-		private ContractParameter param = null;
 		private string name = "";
 		private float[] paramValues = new float[5];
 		private bool generic = false;
@@ -71,15 +70,6 @@ namespace ContractModifier
 		internal paramTypeContainer (Type PType)
 		{
 			paramType = PType;
-			try
-			{
-				param = (ContractParameter)Activator.CreateInstance(PType);
-			}
-			catch (Exception e)
-			{
-				DMCM_MBE.LogFormatted("This Parameter Type: {0} Does Not Have An Empty Constructor And Will Be Skipped: {1}", PType.Name, e);
-				return;
-			}
 			typeName = PType.Name;
 			name = displayName(typeName);
 
@@ -150,11 +140,6 @@ namespace ContractModifier
 		private string displayName(string s)
 		{
 			return Regex.Replace(s, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
-		}
-
-		public ContractParameter Param
-		{
-			get { return param; }
 		}
 
 		public bool Generic
