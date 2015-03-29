@@ -104,6 +104,7 @@ namespace ContractModifier
 			onContractChange.Add(contractChanged);
 			onParamChange.Add(paramChanged);
 			GameEvents.Contract.onOffered.Add(contractOffered);
+			GameEvents.Contract.onContractsListChanged.Add(contractListUpdate);
 
 			if (!disableToolbar)
 			{
@@ -134,6 +135,7 @@ namespace ContractModifier
 			onContractChange.Remove(contractChanged);
 			onParamChange.Remove(paramChanged);
 			GameEvents.Contract.onOffered.Remove(contractOffered);
+			GameEvents.Contract.onContractsListChanged.Remove(contractListUpdate);
 		}
 
 		#region Save/Load
@@ -383,50 +385,66 @@ namespace ContractModifier
 
 		#region contract Events
 
-		private void contractOffered(Contract c)
-		{
-			Type contractT = c.GetType();
-			contractTypeContainer cC = null;
+		private List<Contract> offeredContractList = new List<Contract>();
 
-			if (contractT.Name == "ConfiguredContract")
+		private void contractListUpdate()
+		{
+			foreach (Contract c in offeredContractList)
 			{
-				if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+				Type contractT = c.GetType();
+				contractTypeContainer cC = null;
+
+				if (contractT.Name == "ConfiguredContract")
 				{
-					string name = cmAssemblyLoad.CCTypeName(c);
-					cC = ContractValuesNode.getCType(name);
+					DMCM_MBE.LogFormatted_DebugOnly("CC Contract Offered");
+					if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+					{
+						string name = cmAssemblyLoad.CCTypeName(c);
+						cC = ContractValuesNode.getCType(name);
+					}
+					else
+					{
+						DMCM_MBE.LogFormatted("Contract Configurator Contract Type Detected, But Type Name Can't Be Determined; CC Possibly Out Of Date...");
+						continue;
+					}
 				}
 				else
 				{
-					DMCM_MBE.LogFormatted("Contract Configurator Contract Type Detected, But Type Name Can't Be Determined; CC Possibly Out Of Date...");
-					return;
+					cC = ContractValuesNode.getCType(contractT.Name);
 				}
-			}
-			else
-			{
-				cC = ContractValuesNode.getCType(contractT.Name);
-			}
 
-			if (cC == null)
-				return;
+				if (cC == null)
+					continue;
 
-			if (cC.ContractType == null)
-				return;
+				if (cC.ContractType == null)
+					continue;
 
-			if (cC.MaxActive < 10f || cC.MaxOffer < 10f)
-			{
-				var cList = ContractSystem.Instance.Contracts;
-				int active = 0;
-				int offered = 0;
-				for (int i = 0; i < cList.Count; i++)
+				if (cC.MaxActive < 10f || cC.MaxOffer < 10f)
 				{
-					if (cList[i].GetType().Name == "ConfiguredContract")
+					var cList = ContractSystem.Instance.Contracts;
+					int active = 0;
+					int offered = 0;
+					for (int i = 0; i < cList.Count; i++)
 					{
-						if (!cC.CConfigType)
-							continue;
-						if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+						if (cList[i].GetType().Name == "ConfiguredContract")
 						{
-							string name = cmAssemblyLoad.CCTypeName(cList[i]);
-							if (cC.TypeName == name)
+							if (!cC.CConfigType)
+								continue;
+							if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+							{
+								string name = cmAssemblyLoad.CCTypeName(cList[i]);
+								if (cC.TypeName == name)
+								{
+									if (cList[i].ContractState == Contract.State.Active)
+										active++;
+									else if (cList[i].ContractState == Contract.State.Offered)
+										offered++;
+								}
+							}
+						}
+						else
+						{
+							if (cList[i].GetType() == contractT)
 							{
 								if (cList[i].ContractState == Contract.State.Active)
 									active++;
@@ -435,27 +453,26 @@ namespace ContractModifier
 							}
 						}
 					}
+					int remainingSlots = (int)(cC.MaxActive * 10) - active;
+					if ((offered - 1) >= (int)(cC.MaxOffer * 10) && cC.MaxOffer < 10f)
+					{
+						c.Unregister();
+						c.Decline();
+						ContractSystem.Instance.Contracts.Remove(c);
+						DMCM_MBE.LogFormatted("Contract Type [{0}] Over The Offer Limit, Blocking Offer", contractT.Name);
+					}
+					else if ((offered - 1) >= remainingSlots && cC.MaxActive < 10f)
+					{
+						c.Unregister();
+						c.Decline();
+						ContractSystem.Instance.Contracts.Remove(c);
+						DMCM_MBE.LogFormatted("Contract Type [{0}] Over The Active Limit, Blocking Offer", contractT.Name);
+					}
 					else
 					{
-						if (cList[i].GetType() == contractT)
-						{
-							if (cList[i].ContractState == Contract.State.Active)
-								active++;
-							else if (cList[i].ContractState == Contract.State.Offered)
-								offered++;
-						}
+						updateContractValues(cC, c, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+						updateParameterValues(c);
 					}
-				}
-				int remainingSlots = (int)(cC.MaxActive * 10) - active;
-				if ((offered - 1) >= (int)(cC.MaxOffer * 10) && cC.MaxOffer < 10f)
-				{
-					c.Unregister();
-					ContractSystem.Instance.Contracts.Remove(c);
-				}
-				else if ((offered - 1) >= remainingSlots && cC.MaxActive < 10f)
-				{
-					c.Unregister();
-					ContractSystem.Instance.Contracts.Remove(c);
 				}
 				else
 				{
@@ -463,11 +480,20 @@ namespace ContractModifier
 					updateParameterValues(c);
 				}
 			}
-			else
+
+			if (offeredContractList.Count > 0)
 			{
-				updateContractValues(cC, c, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-				updateParameterValues(c);
+				offeredContractList.Clear();
+				GameEvents.Contract.onContractsListChanged.Fire();
 			}
+		}
+
+		private void contractOffered(Contract c)
+		{
+			Type contractT = c.GetType();
+
+			if (!ContractSystem.Instance.Contracts.Contains(c))
+				offeredContractList.Add(c);
 		}
 
 		private void paramChanged(float[] originals, paramTypeContainer p)
