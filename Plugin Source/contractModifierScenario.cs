@@ -332,7 +332,10 @@ namespace ContractModifier
 
 		private void stringContractParse(string s, string type)
 		{
-			contractTypeContainer c = ContractValuesNode.getCType(type);
+			if (string.IsNullOrEmpty(s))
+				return;
+
+			contractTypeContainer c = ContractValuesNode.getCType(type, false);
 
 			if (c == null)
 			{
@@ -342,20 +345,30 @@ namespace ContractModifier
 
 			string[] a = s.Split(',');
 
-			c.RewardFund = stringFloatParse(a[0], true);
-			c.AdvanceFund = stringFloatParse(a[1], true);
-			c.PenaltyFund = stringFloatParse(a[2], true);
-			c.RewardRep = stringFloatParse(a[3], true);
-			c.PenaltyRep = stringFloatParse(a[4], true);
-			c.RewardScience = stringFloatParse(a[5], true);
-			c.DurationTime = stringFloatParse(a[6], true);
-			c.MaxOffer = stringFloatParse(a[7], false);
-			c.MaxActive = stringFloatParse(a[8], false);
+			try
+			{
+				c.RewardFund = stringFloatParse(a[0], true);
+				c.AdvanceFund = stringFloatParse(a[1], true);
+				c.PenaltyFund = stringFloatParse(a[2], true);
+				c.RewardRep = stringFloatParse(a[3], true);
+				c.PenaltyRep = stringFloatParse(a[4], true);
+				c.RewardScience = stringFloatParse(a[5], true);
+				c.DurationTime = stringFloatParse(a[6], true);
+				c.MaxOffer = stringFloatParse(a[7], false);
+				c.MaxActive = stringFloatParse(a[8], false);
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error While Loading Contract Values...\n{0}", e);
+			}
 		}
 
 		private void stringParamParse(string s, string type)
 		{
-			paramTypeContainer p = ContractValuesNode.getPType(type);
+			if (string.IsNullOrEmpty(s))
+				return;
+
+			paramTypeContainer p = ContractValuesNode.getPType(type, false);
 
 			if (p == null)
 			{
@@ -364,11 +377,18 @@ namespace ContractModifier
 			}
 			string[] a = s.Split(',');
 
-			p.RewardFund = stringFloatParse(a[0], true);
-			p.PenaltyFund = stringFloatParse(a[1], true);
-			p.RewardRep = stringFloatParse(a[2], true);
-			p.PenaltyRep = stringFloatParse(a[3], true);
-			p.RewardScience = stringFloatParse(a[4], true);
+			try
+			{
+				p.RewardFund = stringFloatParse(a[0], true);
+				p.PenaltyFund = stringFloatParse(a[1], true);
+				p.RewardRep = stringFloatParse(a[2], true);
+				p.PenaltyRep = stringFloatParse(a[3], true);
+				p.RewardScience = stringFloatParse(a[4], true);
+			}
+			catch (Exception e)
+			{
+				DMCM_MBE.LogFormatted("Error While Loading Parameter Values...\n{0}", e);
+			}
 		}
 
 		private float stringFloatParse(string s, bool b)
