@@ -276,7 +276,7 @@ namespace ContractModifier
 		{
 			foreach(Type t in parameterTypes.Values)
 			{
-				if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart" || t.Name == "AlwaysTrue" || t.Name == "Any" || t.Name == "All")
+				if (t.Name == "OR" || t.Name == "XOR" || t.Name == "AlwaysTrue" || t.Name == "Any" || t.Name == "All")
 					continue;
 				if (t.IsAbstract)
 					continue;
