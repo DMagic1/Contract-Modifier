@@ -151,15 +151,14 @@ namespace ContractModifier
 			return masterContractList.ElementAtOrDefault(i).Value;
 		}
 
-		public static contractTypeContainer getCType(string s)
+		public static contractTypeContainer getCType(string s, bool warn = true)
 		{
 			if (masterContractList.ContainsKey(s))
 				return masterContractList[s];
-			else
-			{
+			else if (warn)
 				LogFormatted("No Contract Type Of Name: [{0}] Found...", s);
-				return null;
-			}
+				
+			return null;
 		}
 
 		public static paramTypeContainer getPType(int i)
@@ -167,15 +166,14 @@ namespace ContractModifier
 			return masterParamList.ElementAtOrDefault(i).Value;
 		}
 
-		public static paramTypeContainer getPType(string s)
+		public static paramTypeContainer getPType(string s, bool warn = true)
 		{
 			if (masterParamList.ContainsKey(s))
 				return masterParamList[s];
-			else
-			{
+			else if (warn)
 				LogFormatted("No Parameter Type Of Name [{0}] Found...", s);
-				return null;
-			}
+
+			return null;
 		}
 
 		public bool addToContractList(contractTypeContainer c)
@@ -238,7 +236,7 @@ namespace ContractModifier
 			{
 				if (t.Name == "ConfiguredContract")
 					continue;
-				if (getCType(t.Name) == null)
+				if (getCType(t.Name, false) == null)
 				{
 					if (!addToContractList(new contractTypeContainer(t)))
 						LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", t.Name);
@@ -284,7 +282,7 @@ namespace ContractModifier
 					continue;
 				if (t.IsSealed)
 					continue;
-				if (getPType(t.Name) == null)
+				if (getPType(t.Name, false) == null)
 				{
 					if (!addToParamList(new paramTypeContainer(t)))
 						LogFormatted("Error During Parameter Type Loading; [{0}] Cannot Be Added To Parameter Type List", t.Name);
@@ -296,7 +294,7 @@ namespace ContractModifier
 		{
 			foreach (string s in cmAssemblyLoad.ContractConfiguratorTypeNames)
 			{
-				if (getCType(s) == null)
+				if (getCType(s, false) == null)
 				{
 					if (!addToContractList(new contractTypeContainer(s, true)))
 						LogFormatted("Error During Contract Type Loading; [{0}] Cannot Be Added To Contract Type List", s);
@@ -304,26 +302,24 @@ namespace ContractModifier
 			}
 		}
 
-		public static Type getContractType(string name)
+		public static Type getContractType(string name, bool warn = true)
 		{
 			if (contractTypes.ContainsKey(name))
 				return contractTypes[name];
-			else
-			{
+			else if (warn)				
 				LogFormatted("Cannot find Contract Type of name: {0}", name);
-				return null;
-			}
+
+			return null;
 		}
 
-		public static Type getParameterType(string name)
+		public static Type getParameterType(string name, bool warn = true)
 		{
 			if (parameterTypes.ContainsKey(name))
 				return parameterTypes[name];
-			else
-			{
+			else if (warn)
 				LogFormatted("Cannot find Parameter Type of name: {0}", name);
-				return null;
-			}
+
+			return null;
 		}
 
 		public bool DisableToolbar
