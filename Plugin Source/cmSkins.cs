@@ -54,6 +54,7 @@ namespace ContractModifier
 		internal static GUIStyle configCenterLabel;
 		internal static GUIStyle configButton;
 		internal static GUIStyle configToggle;
+		internal static GUIStyle configSliderLabel;
 
 		internal static Texture2D footerBar;
 		internal static Texture2D verticalBar;
@@ -159,6 +160,8 @@ namespace ContractModifier
 			configCenterLabel = new GUIStyle(configLabel);
 			configCenterLabel.name = "ConfigCenterLabel";
 			configCenterLabel.alignment = TextAnchor.MiddleCenter;
+
+			configSliderLabel = new GUIStyle(DMCM_SkinsLibrary.DefUnitySkin.horizontalSlider);
 
 			DMCM_SkinsLibrary.List["CMUnitySkin"].window = new GUIStyle(newWindowStyle);
 			DMCM_SkinsLibrary.List["CMUnitySkin"].button = new GUIStyle(configButton);
