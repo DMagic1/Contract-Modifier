@@ -93,7 +93,6 @@ namespace ContractModifier
 				generic = true;
 			else
 			{
-
 				paramType = ContractValuesNode.getParameterType(typeName);
 
 				paramTypeContainer global = ContractValuesNode.getPType("GlobalSettings");
