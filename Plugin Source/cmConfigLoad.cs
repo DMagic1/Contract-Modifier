@@ -50,7 +50,8 @@ namespace ContractModifier
 		protected override void Start()
 		{
 			DontDestroyOnLoad(this);
-			cmAssemblyLoad.loadReflectionMethods();
+			if (!loaded)
+				cmAssemblyLoad.loadReflectionMethods();
 		}
 
 		protected override void Update()
@@ -66,6 +67,8 @@ namespace ContractModifier
 					loaded = true;
 				}
 			}
+			else
+				Destroy(this);
 		}
 	}
 }
