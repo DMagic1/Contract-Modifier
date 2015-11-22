@@ -457,14 +457,20 @@ namespace ContractModifier
 					if ((offered - 1) >= (int)(cC.MaxOffer * 10) && cC.MaxOffer < 10f)
 					{
 						c.Unregister();
+						float repLoss = HighLogic.CurrentGame.Parameters.Career.RepLossDeclined;
+						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = 0f;
 						c.Decline();
+						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = repLoss;
 						ContractSystem.Instance.Contracts.Remove(c);
 						DMCM_MBE.LogFormatted("Contract Type [{0}] Over The Offer Limit, Blocking Offer", contractT.Name);
 					}
 					else if ((offered - 1) >= remainingSlots && cC.MaxActive < 10f)
 					{
 						c.Unregister();
+						float repLoss = HighLogic.CurrentGame.Parameters.Career.RepLossDeclined;
+						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = 0f;
 						c.Decline();
+						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = repLoss;
 						ContractSystem.Instance.Contracts.Remove(c);
 						DMCM_MBE.LogFormatted("Contract Type [{0}] Over The Active Limit, Blocking Offer", contractT.Name);
 					}
