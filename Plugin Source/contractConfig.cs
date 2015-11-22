@@ -308,7 +308,7 @@ namespace ContractModifier
 		private void closeButton(int id)
 		{
 			Rect r = new Rect(WindowRect.width - 20, 0, 18, 18);
-			if (GUI.Button(r, "✖", cmSkins.configClose))
+			if (GUI.Button(r, "X", cmSkins.configClose))
 			{
 				InputLockManager.RemoveControlLock(lockID);
 				spacecenterLocked = false;
@@ -1080,7 +1080,7 @@ namespace ContractModifier
 			if (!dropDown)
 				f = GUI.HorizontalSlider(r, f, min, max).Mathf_Round(round);
 			else
-				GUI.HorizontalSlider(r, f, min, max);
+				GUI.Label(r, "", cmSkins.configSliderLabel);
 
 			if (f >= -1 && f < -0.05)
 				newVal = f + 1;
