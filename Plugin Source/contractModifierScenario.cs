@@ -41,36 +41,12 @@ namespace ContractModifier
 	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
 	public class contractModifierScenario : ScenarioModule
 	{
+		private static contractModifierScenario instance;
 
 		public static contractModifierScenario Instance
 		{
-			get
-			{
-				if (HighLogic.LoadedScene == GameScenes.MAINMENU)
-					return null;
-
-				Game g = HighLogic.CurrentGame;
-				if (g == null)
-					return null;
-				try
-				{
-					var mod = g.scenarios.FirstOrDefault(m => m.moduleName == typeof(contractModifierScenario).Name);
-					if (mod != null)
-						return (contractModifierScenario)mod.moduleRef;
-					else
-						return null;
-				}
-				catch (Exception e)
-				{
-					DMCM_MBE.LogFormatted("[Contracts Modifier] Could not find Contracts Modifier Scenario Module: {0}", e);
-					return null;
-				}
-			}
-			private set { }
+			get { return instance; }
 		}
-
-		[KSPField(isPersistant = true)]
-		public string version = "1.0";
 
 		public bool allowZero = false;
 		public bool alterActive = false;
@@ -97,6 +73,8 @@ namespace ContractModifier
 
 		private void Start()
 		{
+			instance = this;
+
 			if (onContractChange == null)
 				onContractChange = new EventData<float[], contractTypeContainer>("onContractChange");
 			if (onParamChange == null)
