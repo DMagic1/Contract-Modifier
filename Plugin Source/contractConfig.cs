@@ -84,6 +84,8 @@ namespace ContractModifier
 
 		protected override void Start()
 		{
+			base.Start();
+
 			cList = contractModifierScenario.Instance.setContractTypes(cList);
 			pList = contractModifierScenario.Instance.setParamTypes(pList);
 			if (cList.Count > 0 && pList.Count > 0)
@@ -99,6 +101,8 @@ namespace ContractModifier
 
 		protected override void OnDestroy()
 		{
+			base.OnDestroy();
+
 			if (InputLockManager.lockStack.ContainsKey(lockID))
 				EditorLogic.fetch.Unlock(lockID);
 		}
