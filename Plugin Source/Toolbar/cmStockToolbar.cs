@@ -31,6 +31,7 @@ using System.Collections;
 
 using ContractModifier.Framework;
 using UnityEngine;
+using KSP.UI.Screens;
 
 namespace ContractModifier.Toolbar
 {
