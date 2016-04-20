@@ -141,7 +141,7 @@ The Contract Reward Modifier window presents a set of sliders that allow for cha
 
 [shield:license-mit]: http://img.shields.io/badge/license-mit-a31f34.svg
 [shield:license-cc-by-sa]: http://img.shields.io/badge/license-CC%20BY--SA-green.svg
-[shield:support-ksp]: http://img.shields.io/badge/for%20KSP-v1.0.5-bad455.svg
+[shield:support-ksp]: http://img.shields.io/badge/for%20KSP-v1.1-bad455.svg
 [shield:ckan]: https://img.shields.io/badge/CKAN-Indexed-brightgreen.svg
 [shield:support-toolbar]: http://img.shields.io/badge/works%20with%20Blizzy's%20Toolbar-1.7.x-7c69c0.svg
 [shield:support-ccfg]: https://img.shields.io/badge/works%20with%20Contract%20Configurator-1.x-yellowgreen.svg
