@@ -71,10 +71,13 @@ namespace ContractModifier
 			get { return cmNode; }
 		}
 
-		private void Start()
+		public override void OnAwake()
 		{
 			instance = this;
+		}
 
+		private void Start()
+		{
 			if (onContractChange == null)
 				onContractChange = new EventData<float[], contractTypeContainer>("onContractChange");
 			if (onParamChange == null)
