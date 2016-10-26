@@ -59,6 +59,8 @@ namespace ContractModifier
 
 		protected override void Awake()
 		{
+			base.Awake();
+
 			Assembly assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
 			var ainfoV = Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
 			switch (ainfoV == null)
