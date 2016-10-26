@@ -61,17 +61,29 @@ namespace ContractModifier
 		[Persistent]
 		private List<paramTypeContainer> ParameterTypeConfigs = new List<paramTypeContainer>();
 
-		private static Dictionary<string, contractTypeContainer> masterContractList = new Dictionary<string, contractTypeContainer>();
-		private static Dictionary<string, paramTypeContainer> masterParamList = new Dictionary<string, paramTypeContainer>();
+		private static DictionaryValueList<string, contractTypeContainer> masterContractList = new DictionaryValueList<string, contractTypeContainer>();
+		private static DictionaryValueList<string, paramTypeContainer> masterParamList = new DictionaryValueList<string, paramTypeContainer>();
 
-		private static Dictionary<string, Type> contractTypes = new Dictionary<string, Type>();
-		private static Dictionary<string, Type> parameterTypes = new Dictionary<string, Type>();
+		private static DictionaryValueList<string, Type> contractTypes = new DictionaryValueList<string, Type>();
+		private static DictionaryValueList<string, Type> parameterTypes = new DictionaryValueList<string, Type>();
 
 		public override void OnDecodeFromConfigNode()
 		{
 			try
 			{
-				masterContractList = ContractTypeConfigs.ToDictionary(a => a.TypeName, a => a);
+				int l = ContractTypeConfigs.Count;
+
+				for (int i = 0; i < l; i++)
+				{
+					contractTypeContainer c = ContractTypeConfigs[i];
+
+					if (c == null)
+						continue;
+
+					if (!masterContractList.Contains(c.TypeName))
+						masterContractList.Add(c.TypeName, c);
+				}
+
 			}
 			catch (Exception e)
 			{
@@ -80,7 +92,18 @@ namespace ContractModifier
 
 			try
 			{
-				masterParamList = ParameterTypeConfigs.ToDictionary(a => a.TypeName, a => a);
+				int l = ParameterTypeConfigs.Count;
+
+				for (int i = 0; i < l; i++)
+				{
+					paramTypeContainer c = ParameterTypeConfigs[i];
+
+					if (c == null)
+						continue;
+
+					if (!masterParamList.Contains(c.TypeName))
+						masterParamList.Add(c.TypeName, c);
+				}
 			}
 			catch (Exception e)
 			{
@@ -148,12 +171,15 @@ namespace ContractModifier
 
 		public static contractTypeContainer getCType(int i)
 		{
-			return masterContractList.ElementAtOrDefault(i).Value;
+			if (masterContractList.Count > i)
+				return masterContractList.At(i);
+
+			return null;
 		}
 
 		public static contractTypeContainer getCType(string s, bool warn = true)
 		{
-			if (masterContractList.ContainsKey(s))
+			if (masterContractList.Contains(s))
 				return masterContractList[s];
 			else if (warn)
 				LogFormatted("No Contract Type Of Name: [{0}] Found...", s);
@@ -163,12 +189,15 @@ namespace ContractModifier
 
 		public static paramTypeContainer getPType(int i)
 		{
-			return masterParamList.ElementAtOrDefault(i).Value;
+			if (masterParamList.Count > i)
+				return masterParamList.At(i);
+
+			return null;
 		}
 
 		public static paramTypeContainer getPType(string s, bool warn = true)
 		{
-			if (masterParamList.ContainsKey(s))
+			if (masterParamList.Contains(s))
 				return masterParamList[s];
 			else if (warn)
 				LogFormatted("No Parameter Type Of Name [{0}] Found...", s);
@@ -178,7 +207,7 @@ namespace ContractModifier
 
 		public bool addToContractList(contractTypeContainer c)
 		{
-			if (!masterContractList.ContainsKey(c.TypeName))
+			if (!masterContractList.Contains(c.TypeName))
 			{
 				masterContractList.Add(c.TypeName, c);
 				return true;
@@ -192,7 +221,7 @@ namespace ContractModifier
 
 		public bool addToParamList(paramTypeContainer p)
 		{
-			if (!masterParamList.ContainsKey(p.TypeName))
+			if (!masterParamList.Contains(p.TypeName))
 			{
 				masterParamList.Add(p.TypeName, p);
 				return true;
@@ -217,7 +246,7 @@ namespace ContractModifier
 						{
 							if (t != typeof(Contract))
 							{
-								if (!contractTypes.ContainsKey(t.Name))
+								if (!contractTypes.Contains(t.Name))
 									contractTypes.Add(t.Name, t);
 							}
 						}
@@ -232,10 +261,18 @@ namespace ContractModifier
 
 		private void checkAllContractTypes()
 		{
-			foreach (Type t in contractTypes.Values)
+			int l = contractTypes.Count;
+
+			for (int i = 0; i < l; i++)
 			{
+				Type t = contractTypes.At(i);
+
+				if (t == null)
+					continue;
+
 				if (t.Name == "ConfiguredContract")
 					continue;
+
 				if (getCType(t.Name, false) == null)
 				{
 					if (!addToContractList(new contractTypeContainer(t)))
@@ -257,7 +294,7 @@ namespace ContractModifier
 						{
 							if (t != typeof(ContractParameter))
 							{
-								if (!parameterTypes.ContainsKey(t.Name))
+								if (!parameterTypes.Contains(t.Name))
 									parameterTypes.Add(t.Name, t);
 							}
 						}
@@ -272,16 +309,27 @@ namespace ContractModifier
 
 		private void checkAllParamTypes()
 		{
-			foreach(Type t in parameterTypes.Values)
+			int l = parameterTypes.Count;
+
+			for (int i = 0; i < l; i++)
 			{
+				Type t = parameterTypes.At(i);
+
+				if (t == null)
+					continue;
+
 				if (t.Name == "OR" || t.Name == "XOR" || t.Name == "AlwaysTrue" || t.Name == "Any" || t.Name == "All")
 					continue;
+
 				if (t.IsAbstract)
 					continue;
+
 				if (t.IsGenericType)
 					continue;
+
 				if (t.IsSealed)
 					continue;
+
 				if (getPType(t.Name, false) == null)
 				{
 					if (!addToParamList(new paramTypeContainer(t)))
@@ -304,7 +352,7 @@ namespace ContractModifier
 
 		public static Type getContractType(string name, bool warn = true)
 		{
-			if (contractTypes.ContainsKey(name))
+			if (contractTypes.Contains(name))
 				return contractTypes[name];
 			else if (warn)				
 				LogFormatted("Cannot find Contract Type of name: {0}", name);
@@ -314,7 +362,7 @@ namespace ContractModifier
 
 		public static Type getParameterType(string name, bool warn = true)
 		{
-			if (parameterTypes.ContainsKey(name))
+			if (parameterTypes.Contains(name))
 				return parameterTypes[name];
 			else if (warn)
 				LogFormatted("Cannot find Parameter Type of name: {0}", name);
