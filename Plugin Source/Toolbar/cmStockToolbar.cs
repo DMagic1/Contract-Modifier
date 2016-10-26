@@ -35,11 +35,11 @@ using KSP.UI.Screens;
 
 namespace ContractModifier.Toolbar
 {
-	public class cmStockToolbar : DMCM_MBE
+	public class cmStockToolbar : MonoBehaviour
 	{
 		private ApplicationLauncherButton stockToolbarButton = null;
 
-		protected override void Start()
+		private void Start()
 		{
 			setupToolbar();
 		}
@@ -49,7 +49,7 @@ namespace ContractModifier.Toolbar
 			StartCoroutine(addButton());
 		}
 
-		protected override void OnDestroy()
+		private void OnDestroy()
 		{
 			GameEvents.onGUIApplicationLauncherUnreadifying.Remove(removeButton);
 
@@ -80,9 +80,9 @@ namespace ContractModifier.Toolbar
 
 			//int sceneInt = ContractModifierScenario.currentScene(HighLogic.LoadedScene);
 			if (contractModifierScenario.Instance == null)
-				LogFormatted("Contract Scenario Not Loaded...");
+				DMCM_MBE.LogFormatted("Contract Scenario Not Loaded...");
 			else if (contractModifierScenario.Instance.configWindow == null)
-				LogFormatted("Contract Window Not Loaded...");
+				DMCM_MBE.LogFormatted("Contract Window Not Loaded...");
 			else
 			{
 				contractModifierScenario.Instance.configWindow.Visible = !contractModifierScenario.Instance.configWindow.Visible;

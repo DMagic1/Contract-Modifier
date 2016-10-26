@@ -35,11 +35,11 @@ using UnityEngine;
 namespace ContractModifier.Toolbar
 {
 
-	class cmToolbar : DMCM_MBE
+	class cmToolbar : MonoBehaviour
 	{
 		private IButton contractButton;
 
-		protected override void Start()
+		private void Start()
 		{
 			setupToolbar();
 		}
@@ -69,9 +69,8 @@ namespace ContractModifier.Toolbar
 				};
 		}
 
-		protected override void OnDestroy()
+		private void OnDestroy()
 		{
-			if (!ToolbarManager.ToolbarAvailable) return;
 			if (contractButton != null)
 				contractButton.Destroy();
 		}
