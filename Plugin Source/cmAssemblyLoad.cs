@@ -118,9 +118,14 @@ namespace ContractModifier
 				return true;
 
 			try
-			{
-				CPlusType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
-					.SingleOrDefault(t => t.FullName == contractsWindowPlusTypeName);
+			{				
+				AssemblyLoader.loadedAssemblies.TypeOperation(t =>
+				{
+					if (t.FullName == contractsWindowPlusTypeName)
+					{
+						CPlusType = t;
+					}
+				});
 
 				if (CPlusType == null)
 				{
@@ -189,8 +194,15 @@ namespace ContractModifier
 		{
 			try
 			{
-				Type CConfigType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
-						.SingleOrDefault(t => t.FullName == contractConfiguratorTypeName);
+				Type CConfigType = null;
+
+				AssemblyLoader.loadedAssemblies.TypeOperation(t =>
+				{
+					if (t.FullName == contractConfiguratorTypeName)
+					{
+						CConfigType = t;
+					}
+				});
 
 				if (CConfigType == null)
 				{
@@ -236,8 +248,15 @@ namespace ContractModifier
 
 			try
 			{
-				Type CConfigType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
-						.SingleOrDefault(t => t.FullName == contractConfiguratorCCTypeName);
+				Type CConfigType = null;
+
+				AssemblyLoader.loadedAssemblies.TypeOperation(t =>
+				{
+					if (t.FullName == contractConfiguratorCCTypeName)
+					{
+						CConfigType = t;
+					}
+				});
 
 				if (CConfigType == null)
 				{
