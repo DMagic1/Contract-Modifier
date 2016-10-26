@@ -68,7 +68,7 @@ namespace ContractModifier
 				}
 			}
 			else
-				Destroy(this);
+				Destroy(gameObject);
 		}
 	}
 }
