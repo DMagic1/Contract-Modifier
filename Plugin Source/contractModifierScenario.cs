@@ -84,6 +84,7 @@ namespace ContractModifier
 				onParamChange = new EventData<float[], paramTypeContainer>("onParamChange");
 			onContractChange.Add(contractChanged);
 			onParamChange.Add(paramChanged);
+			GameEvents.Contract.onAccepted.Add(contractAccepted);
 			GameEvents.Contract.onOffered.Add(contractOffered);
 			GameEvents.Contract.onContractsListChanged.Add(contractListUpdate);
 
@@ -115,6 +116,7 @@ namespace ContractModifier
 
 			onContractChange.Remove(contractChanged);
 			onParamChange.Remove(paramChanged);
+			GameEvents.Contract.onAccepted.Remove(contractAccepted);
 			GameEvents.Contract.onOffered.Remove(contractOffered);
 			GameEvents.Contract.onContractsListChanged.Remove(contractListUpdate);
 		}
@@ -397,7 +399,6 @@ namespace ContractModifier
 
 				if (contractT.Name == "ConfiguredContract")
 				{
-					DMCM_MBE.LogFormatted_DebugOnly("CC Contract Offered");
 					if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
 					{
 						string name = cmAssemblyLoad.CCTypeName(c);
@@ -460,6 +461,7 @@ namespace ContractModifier
 						c.Unregister();
 						float repLoss = HighLogic.CurrentGame.Parameters.Career.RepLossDeclined;
 						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = 0f;
+						c.IgnoresWeight = true;
 						c.Decline();
 						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = repLoss;
 						ContractSystem.Instance.Contracts.Remove(c);
@@ -470,6 +472,7 @@ namespace ContractModifier
 						c.Unregister();
 						float repLoss = HighLogic.CurrentGame.Parameters.Career.RepLossDeclined;
 						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = 0f;
+						c.IgnoresWeight = true;
 						c.Decline();
 						HighLogic.CurrentGame.Parameters.Career.RepLossDeclined = repLoss;
 						ContractSystem.Instance.Contracts.Remove(c);
@@ -495,10 +498,36 @@ namespace ContractModifier
 			}
 		}
 
-		private void contractOffered(Contract c)
+		private void contractAccepted(Contract c)
 		{
 			Type contractT = c.GetType();
 
+			if (contractT.Name == "ConfiguredContract")
+			{
+				if (cmAssemblyLoad.ContractConfiguratorCCLoaded)
+				{
+					string name = cmAssemblyLoad.CCTypeName(c);
+					contractTypeContainer cC = ContractValuesNode.getCType(name);
+
+					if (cC == null)
+						return;
+
+					if (cC.ContractType == null)
+						return;
+
+					updateContractValues(cC, c, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+					updateParameterValues(c);
+				}
+				else
+				{
+					DMCM_MBE.LogFormatted("Contract Configurator Contract Type Detected, But Type Name Can't Be Determined; CC Possibly Out Of Date...");
+					return;
+				}
+			}
+		}
+
+		private void contractOffered(Contract c)
+		{
 			if (!ContractSystem.Instance.Contracts.Contains(c))
 				offeredContractList.Add(c);
 		}
@@ -602,16 +631,13 @@ namespace ContractModifier
 			if (ContractSystem.Instance.Contracts.Contains(c))
 			{
 				var cParams = c.AllParameters;
-				if (cParams.Count() > 0)
+				for (int i = 0; i < cParams.Count(); i++)
 				{
-					for (int i = 0; i < cParams.Count(); i++)
+					string name = cParams.ElementAt(i).GetType().Name;
+					paramTypeContainer p = ContractValuesNode.getPType(name);
+					if (p != null)
 					{
-						string name = cParams.ElementAt(i).GetType().Name;
-						paramTypeContainer p = ContractValuesNode.getPType(name);
-						if (p != null)
-						{
-							updateParameterValues(p, new List<ContractParameter>() { cParams.ElementAt(i) }, new float[5] { 1, 1, 1, 1, 1 });
-						}
+						updateParameterValues(p, new List<ContractParameter>() { cParams.ElementAt(i) }, new float[5] { 1, 1, 1, 1, 1 });
 					}
 				}
 			}
