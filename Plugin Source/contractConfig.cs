@@ -306,7 +306,7 @@ namespace ContractModifier
 				}
 			}
 
-			if (dropDown && Event.current.type == EventType.mouseDown && !ddRect.Contains(Event.current.mousePosition))
+			if (dropDown && Event.current.type == EventType.MouseDown && !ddRect.Contains(Event.current.mousePosition))
 				dropDown = false;
 		}
 
